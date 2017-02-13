@@ -24,7 +24,7 @@ int main(void) {
 	printf(" a:Factorial\n b:Leap Year?\n c:Maximum\n d:Division of two numbers\n e:Exit program.\nEnter your choice: (a,b,c,d,or e)\n");
 	scanf(" %c", &choice);
 	fflush(stdout);
-
+	printf("statements..\n");
 
 	switch(choice){
 	case 'a':
