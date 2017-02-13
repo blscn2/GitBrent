@@ -28,7 +28,7 @@ int main(void) {
 
 	switch(choice){
 	case 'a':
-		printf("Enter a number: \n");
+		printf("Enter a number: \n"); //Restrict to values that would fit in unsigned long (12)
 		scanf("%hu", &input);
 		output = 1;
 		for(i = 1; i <= input; i++){
