@@ -34,7 +34,7 @@ int main( int argc, char *argv[]){
 	int i, statistics = 0, center = 0, normalize = 0, rename = 0, filenumber = 0, help = 0, offset_check = 0, scale_check = 0;
 	float offset_value = 0, scale_factor = 0;
 	char *filename = NULL;
-	char file_name[20];
+	char file_name[50];
 
 	// Loop through command line to find needed key words
 	for(i=1;i<argc;i++){
@@ -134,7 +134,7 @@ int main( int argc, char *argv[]){
 			printf("No file number given\n");
 			return -1;
 		}else{
-			if((filenumber < 1) | (filenumber > 11)){
+			if((filenumber < 1) | (filenumber > 20)){
 				printf("Invalid file number\n");
 				return -1;
 			}
@@ -193,12 +193,12 @@ int main( int argc, char *argv[]){
 		// if the center flag is set
 		if(center == 1){
 			printf("Doing center \nFilenumber = %d \n", filenumber);
-	//		if(filenumber<10){
-	//			sprintf(file_name,"Centered_data_0%d.txt",filenumber);
-	//		}else{
-	//			sprintf(file_name,"Centered_data_%d.txt",filenumber);
-	//		}
-			sprintf(file_name, "Centered_data.txt");
+			if(filenumber<10){
+				sprintf(file_name,"Centered_data_0%d.txt",filenumber);
+			}else{
+				sprintf(file_name,"Centered_data_%d.txt",filenumber);
+			}
+
 			printf("New text file created.\n");
 			centerSignal(array,file_name);
 		}
@@ -206,12 +206,12 @@ int main( int argc, char *argv[]){
 		// if the normalize flag is set
 		if(normalize == 1){
 			printf("Doing normalize\nFilenumber = %d \n", filenumber);
-	//		if(filenumber<10){
-	//			sprintf(file_name,"Normalized_data_0%d.txt",filenumber);
-	//		}else{
-	//			sprintf(file_name,"Normalized_data_%d.txt",filenumber);
-	//		}
-			sprintf(file_name, "Normalized_data.txt");
+			if(filenumber<10){
+				sprintf(file_name,"Normalized_data_0%d.txt",filenumber);
+			}else{
+				sprintf(file_name,"Normalized_data_%d.txt",filenumber);
+			}
+
 			printf("Created normalized data txt file.\n");
 			normalizeSignal(array,file_name);
 		}
@@ -319,13 +319,13 @@ double max(int *array){
 // This function generates a file containing the mean and max of each raw file
 void createStatisticsFile(int *array, int file){
 
-	char file_name[20];
-	//if(file<10){
-	//	sprintf(file_name,"Statistics_data_0%d.txt",file);
-	//}else{
-	//	sprintf(file_name,"Statistics_data_%d.txt",file);
-	//}
-	sprintf(file_name, "Statistics_data.txt");
+	char file_name[50];
+	if(file<10){
+		sprintf(file_name,"Statistics_data_0%d.txt",file);
+	}else{
+		sprintf(file_name,"Statistics_data_%d.txt",file);
+	}
+
 	FILE * fp = fopen(file_name,"w");
 	fprintf(fp,"%.4f %.0f \n",mean(array),max(array));
 	fclose(fp);
