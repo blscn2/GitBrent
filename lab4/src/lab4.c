@@ -164,6 +164,7 @@ int main( int argc, char *argv[]){
 
 		// if the scale flag is set
 		if(scale_check == 1){
+			printf("File number = %d \n", filenumber);
 			if(scale_factor == 0){
 				printf("No scale factor\n");
 			}else{
@@ -191,23 +192,27 @@ int main( int argc, char *argv[]){
 
 		// if the center flag is set
 		if(center == 1){
-			printf("Doing center\n");
-			if(filenumber<10){
-				sprintf(file_name,"Centered_data_0%d.txt",filenumber);
-			}else{
-				sprintf(file_name,"Centered_data_%d.txt",filenumber);
-			}
+			printf("Doing center \nFilenumber = %d \n", filenumber);
+	//		if(filenumber<10){
+	//			sprintf(file_name,"Centered_data_0%d.txt",filenumber);
+	//		}else{
+	//			sprintf(file_name,"Centered_data_%d.txt",filenumber);
+	//		}
+			sprintf(file_name, "Centered_data.txt");
+			printf("New text file created.\n");
 			centerSignal(array,file_name);
 		}
 
 		// if the normalize flag is set
 		if(normalize == 1){
-			printf("Doing normalize\n");
-			if(filenumber<10){
-				sprintf(file_name,"Normalized_data_0%d.txt",filenumber);
-			}else{
-				sprintf(file_name,"Normalized_data_%d.txt",filenumber);
-			}
+			printf("Doing normalize\nFilenumber = %d \n", filenumber);
+	//		if(filenumber<10){
+	//			sprintf(file_name,"Normalized_data_0%d.txt",filenumber);
+	//		}else{
+	//			sprintf(file_name,"Normalized_data_%d.txt",filenumber);
+	//		}
+			sprintf(file_name, "Normalized_data.txt");
+			printf("Created normalized data txt file.\n");
 			normalizeSignal(array,file_name);
 		}
 	return 0;
@@ -315,16 +320,16 @@ double max(int *array){
 void createStatisticsFile(int *array, int file){
 
 	char file_name[20];
-	if(file<10){
-		sprintf(file_name,"Statistics_data_0%d.txt",file);
-	}else{
-		sprintf(file_name,"Statistics_data_%d.txt",file);
-	}
-	printf("here");
+	//if(file<10){
+	//	sprintf(file_name,"Statistics_data_0%d.txt",file);
+	//}else{
+	//	sprintf(file_name,"Statistics_data_%d.txt",file);
+	//}
+	sprintf(file_name, "Statistics_data.txt");
 	FILE * fp = fopen(file_name,"w");
-	printf("doing fprintf\n");
 	fprintf(fp,"%.4f %.0f \n",mean(array),max(array));
 	fclose(fp);
+	printf("Statistics text file created.\n");
 }
 
 // This function offsets the signal based on an offset value inputted
