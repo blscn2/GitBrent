@@ -14,7 +14,7 @@
 using namespace std;
 
 // class for a signal
-class Signal{
+class Signal{					// FIX MAX READ IN  AND UPDATE CURRENT VECTOR
 	// private members
 
 	private:
@@ -33,16 +33,16 @@ class Signal{
 		int max;
 		double average;
 		int length;
-		//double *data = NULL;
+		//double *data = NULL;		replaced by next line
 		vector<double>data;
 		vector<double>array;
-		//double *array = NULL;
+		//double *array = NULL;		replaced by previous line
 		int check;
 
 
 		// open file, read data into private variables, close file
-		Signal();				//receives nothing
-		Signal(int); 			//receives file number
+		Signal();				// receives nothing
+		Signal(int); 			// receives file number
 		Signal(const char *); 	// receives filename
 		~Signal();
 
@@ -52,13 +52,11 @@ class Signal{
 		void center(Signal);
 		void normalize(Signal);
 		void statistics();
-		//void exit();
-		//int check_file_success();
+
 		void sig_info();
 		void save_file(int,int);
 		void print_signal(vector<double>);
 		void mean();
-		void deletePointers();
 		int check_file_success();
 
 
@@ -79,9 +77,7 @@ int Signal::check_file_success(){
 // This function writes the transformed signal to a file
 void Signal::save_file(int flag, int num){
 	char filename[50];
-	// Below forms the filename for the output file to write the new signal to
-	// if no transformations have been done then there is no point
-	// to create a file with the raw signal because that file already exists
+
 	if(flag == 0){
 		cout << "No transformations have been done." << endl;
 		return;
@@ -143,7 +139,7 @@ void Signal::sig_info(){
 
 // This method prints an array of doubles
 void Signal::print_signal(vector<double>x){
-	//cout << "Inside print" <<endl;
+
 	int i;
 	for(i=0;i<length;i++){
 		cout << x[i];
@@ -178,7 +174,7 @@ void Signal::mean(){
 void Signal::operator+(double offset_value){
 	cout << "Offset started" << endl;
 	int i;
-	//array = new double [length];
+
 	if(array.empty()){
 		for(i=0;i<length;i++){
 			array.push_back(data[i] + offset_value);
@@ -195,9 +191,9 @@ void Signal::operator+(double offset_value){
 //This function scales the signal based on a scale factor inputted
 void Signal::operator*(double scale_factor){
 	cout << "Scale started" << endl;
-	//array = new double [length];
+
 	int i;
-	//printf("%f\n",scale_factor);
+
 	if(array.empty()){
 		for(i=0;i<length;i++){
 			array.push_back(data[i] * scale_factor);
@@ -266,7 +262,7 @@ Signal::Signal(int file){
 	for(i=0;i<length;i++){
 		fscanf(fp,"%lf",&cell);
 		data.push_back(cell);
-		//cout << data[i] << endl;
+
 	}
 
 	// Display the signal
@@ -307,7 +303,10 @@ Signal::~Signal(){
 Signal operator+(Signal &one, Signal &two){
 
 	Signal three;
-
+	if( one.length != two.length){ //Error checking to make sure they are same length
+		cout << "\nSignals are not the same length. Exiting." << endl;
+		return three;
+	} else {
 	// do element additions between one and two and then assign
 	// those values to three's data
 	for(int i=0;i<one.data.size();i++){
@@ -316,11 +315,7 @@ Signal operator+(Signal &one, Signal &two){
 	cout << endl;
 
 	// get the max
-	if(one.max > two.max){
-		three.max = one.max;
-	}else{
-		three.max = two.max;
-	}
+	three.max = 1;
 
 	double total;
 
@@ -331,7 +326,11 @@ Signal operator+(Signal &one, Signal &two){
 		total+=three.data[i];
 		cout << three.data[i];
 		cout << " ";
+		if(three.data[i] > three.max){
+			three.max = three.data[i];
+		}
 	}
+
 	three.average = total/three.data.size();
 
 	cout << "\nThe max is: " << three.max << endl;
@@ -339,6 +338,7 @@ Signal operator+(Signal &one, Signal &two){
 
 
 	return three;
+	}
 }
 
 int main(int argc, char *argv[]){
@@ -354,11 +354,11 @@ int main(int argc, char *argv[]){
 		cout << "Enter filename> " << endl;
 		cin >> filename;
 	}
-	// otherwise
+	// if command line arguments are given
 	else if(argc == 3){
 		// if -n is given
 		if(strcmp(argv[1],"-n") == 0){
-			//cout << "File number given" << endl;
+
 			// check that a number is given
 			if(isdigit(*argv[2])){
 				filenumber = atoi(*(argv+2));
@@ -418,7 +418,7 @@ int main(int argc, char *argv[]){
 
     // find the average of the signal
     sig1.mean();
-    //cout << filenumber << endl;
+
 
     // User menu
 	while(1){
@@ -483,7 +483,7 @@ int main(int argc, char *argv[]){
 			case 8:{
 				// this is for the non-member addition operator
 				Signal sig2("Raw_data_01.txt");
-				Signal sig3("Raw_data_01.txt");
+				Signal sig3("newdata.txt");
 				Signal added;
 
 				added = operator+(sig2,sig3);
@@ -491,6 +491,7 @@ int main(int argc, char *argv[]){
 				}
 			default: {
 				cout << "Invalid choice. Try again." << endl;
+				cin >> choice;
 				break;
 				}
 
