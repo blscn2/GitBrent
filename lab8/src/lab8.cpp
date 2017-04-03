@@ -1,213 +1,209 @@
 //============================================================================
-// Name        : lab8.cpp
+// Name        : Lab 8
 // Author      : Brent Schultz
 // Version     :
 // Copyright   : Your copyright notice
-// Description : Lab 8 Morse Code Generator
+// Description : Morse Code Generator
 //============================================================================
 
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <string>
+
+#define NUM_LETTERS 26
+
 using namespace std;
 
-// string letters = "abcd...z";
-// morsecode[] = {".-","-...",...};       DELETE THESE
-// int index = letters.find('c')
-// int l = letters.length();
-// isupper()/tolower()
+string Letters = "abcdefghijklmnopqrstuvwxyz";
+string mCode[] = { ".-", "-...", "-.-.", "-..", ".", "..-.", "--.", "....", "..", ".---", "-.-", ".-..", "--", "-.", "---", ".--.", "--.-", ".-.", "...", "-", "..-", "...-", ".--", "-..-", "-.--", "--.." };
 
-// Message Class
-class Message {
-	// protected members that can be accessed by derived classes
-	protected:
-		string msg;
-		string transformed;
-	// public members and methods
+
+class Message { 
+	protected: string msg;
+
 	public:
-		Message();				//default constructor
-		Message(string);		//given the message
-		virtual ~Message();		//destructor
-		// virtual print_msg() method
-		virtual void print_msg();
+		virtual void printInfo(void);
+		// Constructors
+		Message();
+		Message(string m);
+		//Destructor
+		~Message();
 };
 
-// Message constructor with string parameter
-Message::Message(string message){
-	msg = message;
-}
-// Message constructor with no parameters
-Message::Message(){
-	cout << "Enter message: ";
+//Empty constructor will ask for an input
+Message::Message() { 
+	cout << "Enter a message: ";
 	cin >> msg;
 }
-// Redefined print_msg()
-void Message::print_msg(){
-	cout << "\n__ Inside Message Print ___________" << endl;
-	cout << "\tThe message is: " << msg << endl;
-	cout << "___________________________________\n";
+
+//Takes input from command line if given
+Message::Message(string m) {
+	msg = m;
 }
 
-Message::~Message(){
-	cout << "Goodbye Message" << endl;
-
+//Print just the message using the base class...
+void Message::printInfo(void) {
+	cout << "Original text: " << msg << endl;
+	cout << endl;
 }
 
-// MoreCodeMessage class
-class MorseCodeMessage : public Message{
-	// no private members
+Message::~Message() {
+	cout<<"Base class destructor" << endl;
+}
+	
+
+
+class morseCodeMessage : public Message {
 	private:
-	// public members and methods
-	public:
+		string *translated_msg;
 		void translate();
-		void print_msg();
-		MorseCodeMessage(string m);
-		MorseCodeMessage();
-		~MorseCodeMessage();
-};
-
-// MorseCodeMessage constructor when no message is given
-MorseCodeMessage::MorseCodeMessage() : Message(){
-	// If no message is given
-	// This is needed so that if a MoreCodeMessage is created, the base class is called
-}
-
-// MorseCodeMessage constructor when a message is given
-MorseCodeMessage::MorseCodeMessage(string m) : Message(m){
-	// If a message is given
-	// This is needed so that if a MoreCodeMessage is created, the base class is called
-}
-
-MorseCodeMessage::~MorseCodeMessage(){
-	cout << "Goodbye MorseCodeMessage" << endl;
-}
-
-
-// Converts the input message to morse code and stores it in the transformed
-// member of the Message class protected
-void MorseCodeMessage::translate(){
-	int i;
-	string letters = "abcdefghijklmnopqrstuvwxyz";
-	string morseCode[26] = {".-","-...","-.-.","-..",".","..-.","--.","....","..",".---","-.-",".-..","--","-.","---",".--.","--.-",".-.","...","-","..-","...-",".--","-..-","-.--","--.."};
-	// Goes through the message converting each character to morse code
-	for(i=0;i<msg.length();i++){
-		int index = letters.find(tolower(msg[i]));		// converts to lowercase is uppercase and then finds that character in letters
-		transformed = transformed + morseCode[index];	// adds on each character based on the index from the letters
-		transformed = transformed + "#";				// adds a seperator between each character
-		//cout << morseCode[index] << endl;
-	}
-	transformed = transformed+'$'; // tacks on an "end of string" character
-}
-
-// Redefined print_msg() for the MoreCodeMessage class
-void MorseCodeMessage::print_msg(){
-	cout << "\n__ Inside MorseCodeMessage Print ______" << endl;
-	cout << "\tMessage: " << msg << endl;
-	cout << "\tMorse Code: ";
-	int i = 0;
-	// Goes through the transformed message looking for spaces (#) or
-	// the end of string ($) while printing each morse code character
-	for(i=0;i<transformed.length();i++){
-		if(transformed[i] == '$'){ 			// if end of string
-			break;
-		}else if(transformed[i] == '#'){	// if "space"
-			cout << "  ";
-		}else{
-			cout << transformed[i];			// print out morse code value
-		}
-	}
-	cout << "\n_______________________________________\n";
-
-}
-
-// messageStack class
-class messageStack{
 	public:
-		messageStack();
-		~messageStack();
-		void push(Message *obj);
-		void pop();
-		void print_stack();
-		Message *stackptr[10];
+
+
+		// Overrides virtual:
+		void printInfo();
+		// Constructor
+		morseCodeMessage();
+		// Destructor
+		~morseCodeMessage();
+};
+//Constructor
+morseCodeMessage::morseCodeMessage() {
+	translated_msg = new string[msg.length()];
+	translate();
+}
+//Destructor
+morseCodeMessage::~morseCodeMessage() {
+	delete[] translated_msg;
+	cout<< "morseCodeMessage destructor." <<endl;
+}
+
+//Translates the input
+void morseCodeMessage::translate() {
+	for(int i=0; i<msg.length(); i++)
+	{
+		for(int j=0; j<NUM_LETTERS; j++)
+		{
+			if(msg[i] == Letters[j])
+			{
+				translated_msg[i] = mCode[j];
+				break;
+			}
+		}
+	}
+}
+//Prints the original message followed by the translated message		
+void morseCodeMessage::printInfo() {
+	cout << "Original text: " << msg << endl;
+	cout << "Morse code: ";
+	for(int i=0; i<msg.length(); i++)
+	{
+		cout << translated_msg[i];
+	}
+	cout << endl;
+	cout << endl;
+}
+
+class messageStack {
+	public:
+		
+		Message *stack[10]; 
+		messageStack(Message *);
+		int stack_top_index;
+		int num_obj;
+		//~messageStack();
+		void pop();         //LIFO
+		void push(Message *); //LIFO
+		void printStack();
+	private:
+
 };
 
-// constructor messageStack
-messageStack::messageStack(){
-	int i;
-	// initializes each steachptr pointer to NULL
-	for(i=0;i<10;i++){
-		stackptr[i] = NULL;
+messageStack::messageStack(Message *m) {
+	stack_top_index = 9;
+	num_obj = 0;
+	push(m);
+}
+
+void messageStack::printStack(void) {
+//	cout << "Stack top index: " << stack_top_index << endl;
+	cout << "-------------------" << endl;
+	
+	for(int i=stack_top_index; i<10; i++)
+	{
+//		cout << "Current index: " << i << endl;
+		stack[i]->printInfo();
+	}
+}
+		
+//LIFO pops off the top of the stack
+void messageStack::pop(void) {
+	if(num_obj == 0)
+	{
+		stack_top_index = 9;
+		cout << "Stack empty\n";
+		return;
+	}
+	else
+	{
+		num_obj--;
+		(stack_top_index > 9) ? stack_top_index=9 : stack_top_index++;
 	}
 }
 
-// message stack destructor
-messageStack::~messageStack(){
-	cout << "Goodbye messageStack" << endl;
-}
-
-// method to push a Message object onto the stack
-// takes in an object pointer to allow for dynamic binding
-void messageStack::push(Message *obj){
-	int i;
-	// start at the bottom of the stack and look for the top of the stack to add the new object too
-	for(i=9;i>=0;i--){				// reverse order for lifo
-		if(stackptr[i] == NULL){	// if stackptr location is empty, otherwise move to the next location
-			stackptr[i] = obj;
+//Pushes the new message to the top of the stack
+void messageStack::push(Message *m) {
+	if(num_obj == 0)
+	{
+		stack[stack_top_index] = m;
+	}
+	else
+	{
+		if(stack_top_index == 0)
+		{
+			cout << "Stack full\n"; 
 			return;
 		}
+		stack[--stack_top_index] = m;
 	}
-	cout << "\nThe stack is full, cannot push anything else\n" << endl;
-}
+	num_obj++;
 
-void messageStack::pop(){
-	int i;
-
-	// start at the top of the stack and look for a not NULL location
-	for(i=0;i<10;i++){
-		if(stackptr[i] != NULL){
-			stackptr[i] = NULL;
-			return;
-		}
 	}
-	cout << "\nThe stack is empty\n" << endl;
-	// Notice the object that is being popped does not need to be
-	// freed because it was never directly allocated memory by me,
-	// so it it still handled
-}
 
-// print_stack to print each object in the stack
-void messageStack::print_stack(){
-	int i;
-	cout << "\n########## Printing the stack... ##########" << endl;
-	for(i=0;i<10;i++){
-		if(stackptr[i] != NULL){
-			stackptr[i]->print_msg();		// calls each objects respective print_msg()
-		}
+
+int main(int argc, char **argv) {
+
+	if(argc > 1) 
+	{
+		//Print a command line argument to show that the base class works on its own.
+		Message m1 = Message(argv[1]);
+		m1.printInfo();
+
 	}
-	cout << "\n###########################################" << endl;
-}
 
-int main(void){
+	// Ask user for message to translate
+	morseCodeMessage m1 = morseCodeMessage();
+//	m1.printInfo();
+	morseCodeMessage m2 = morseCodeMessage();
+	morseCodeMessage m3 = morseCodeMessage();
+	Message m4 = Message("new mesage");
+	
+	cout<<endl;
 
-	messageStack st = messageStack();		// form the stack
+	messageStack ms1 = messageStack(&m1);
+	ms1.push(&m2);
+	ms1.push(&m3);
+	ms1.push(&m4);
 
-	Message m1("Bottom"), m2, m3;			// create some Message objects
-	st.push(&m1);							// push these message objects to the stack
-	st.push(&m2);
-	st.push(&m3);
+	ms1.printStack();
+	
+	cout<< "First pop" << endl;
+	ms1.pop();
+	ms1.printStack();
 
-	MorseCodeMessage c1,c2,c3("Top");		// create some MorseCodeMessage objects
-	c1.translate();							// translate these objects to Morse Code
-	c2.translate();
-	c3.translate();
+	cout<< "Second pop" << endl;
+	ms1.pop();
+	ms1.printStack();
 
-	st.push(&c1);							// push these MorseCodeMessage objects to the stack
-	st.push(&c2);
-	st.push(&c3);
-	st.print_stack();						// print out the stack
-	st.pop();								// pop from the stack
-	st.print_stack();						// print out the stack
-
+	cout<< "Ending program" << endl;
 	return 0;
 }
