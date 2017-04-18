@@ -30,3 +30,9 @@ void Customer::printInfo(void){
 	cout << "Account number: " << accountnumber << endl;
 	cout << "Account baland: $" << balance << endl;
 }
+
+int main(int argc, char* argv[])
+{
+	cout << "Thank you!" <<endl;
+	return 0;
+}
