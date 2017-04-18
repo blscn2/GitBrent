@@ -22,12 +22,15 @@ class Customer{
 		string accounttype = "Standard or student or loyal";
 
 	public:
+		double amount;
+
+
 		virtual void printInfo(void);
 		void Withdrawal();
 		void Deposit();
 		void Invest();
+		void Options();
 
-		void CloseAccount();
 		~Customer();
 
 }
@@ -41,6 +44,24 @@ void Customer::printInfo(void){
 
 Customer::~Customer(){
 
+}
+
+void Withdrawal(){
+	cout << "Current acount balance: $" << balance << endl << "How much would you like to withdraw?" << endl;
+	cin >> amount;
+	try{
+		if( amount > balance){
+			throw "Unable to process this transaction. (Withdrawal of this size would result in negative balance";
+		}
+		balance -= amount;
+	}
+}
+
+void Deposit(){
+	cout << "Current acount balance: $" << balance << endl << "How much would you like to deposit?" << endl;
+	cin >> amount;
+	balance += amount;
+	cout << "Your new balance is: $" << balance << endl;
 }
 
 int main(int argc, char* argv[])
