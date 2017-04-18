@@ -15,7 +15,18 @@ using namespace std;
 
 
 class Customer{
-	private:
+	protected:
+		string name = "John Doe";
+		int accountnumber = 123456;
+		double balance = 356.25;
 
 	public:
+		virtual void printInfo(void);
+
+}
+
+void Customer::printInfo(void){
+	cout << "Account holder name: " << name << endl;
+	cout << "Account number: " << accountnumber << endl;
+	cout << "Account baland: $" << balance << endl;
 }
