@@ -46,8 +46,8 @@ Customer::~Customer(){
 
 }
 
-void Withdrawal(){
-	cout << "Current acount balance: $" << balance << endl << "How much would you like to withdraw?" << endl;
+void Customer::Withdrawal(){
+	cout << "Current account balance: $" << balance << endl << "How much would you like to withdraw?" << endl;
 	cin >> amount;
 	try{
 		if( amount > balance){
@@ -57,11 +57,15 @@ void Withdrawal(){
 	}
 }
 
-void Deposit(){
+void Customer::Deposit(){
 	cout << "Current acount balance: $" << balance << endl << "How much would you like to deposit?" << endl;
 	cin >> amount;
 	balance += amount;
 	cout << "Your new balance is: $" << balance << endl;
+}
+
+void Customer::Options(){
+
 }
 
 int main(int argc, char* argv[])
