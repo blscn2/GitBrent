@@ -11,14 +11,29 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
 
 using namespace std;
 
 
-class Customer{
+//============================ Classes =======================================
+class Person {
 	protected:
 		string name = "John Doe";
 		int accountnumber = 123456;
+		string username;
+		string password;
+
+	public:
+		virtual void printInfo( void ) = 0;
+		bool isOpen( );
+		Person( );
+		Person( string , int, string, string);
+		~Person( );
+};
+
+class Customer: public Person {
+	protected:
 		double balance = 356.25;
 		string accounttype = "Standard or student or loyal";
 
@@ -33,6 +48,38 @@ class Customer{
 		void Options();
 
 		~Customer();
+
+};
+//============================ Class functions ================================
+/*	Default constructor
+	Initializes everyting to their zero value */
+Person::Person( )
+{
+	name = "";
+	num = 0;
+}
+
+/*	Parametric constructor
+	Initializes the two private variables to the passed values */
+Person::Person(string n, int num, string user, string pass)
+{
+	name = n;
+	accountnumber = num;
+	username = user;
+	password = pass;
+}
+
+/*	Public function
+	Returns is the account has been open: i.e. initialized. */
+bool Person::isOpen( )
+{
+	return ( name.empty ); // I am not completely sure this will give output wanted.
+}
+
+/*	Deconstructor
+	Does nothing currently since nothing is dynamically allocated */
+Person::~Person( )
+{
 
 }
 
@@ -69,6 +116,38 @@ void Customer::Options(){
 
 }
 
+//============================ Other functions ===============================
+/*	Global funciton
+	Opens fills and checks the information to validate the correct user is there*/
+Person* login( string user, string pass ) throw(string)
+{
+	fstream in( "Accounts.txt", fstream::in );
+	
+	string name;
+	string word;
+	char type;
+
+	while( cin >> name >> word >> type )
+	{
+		try {
+			if( name == user )
+			{
+				if( word != pass )
+				{
+					throw "Invalid username or password";
+				}
+				else
+					break;
+			}
+			else
+				continue;
+		}
+	}
+
+	return NULL;
+}
+
+//============================ Main ==========================================
 int main(int argc, char* argv[])
 {
 	char choice = '0';
@@ -97,24 +176,32 @@ int main(int argc, char* argv[])
 	{
 	case '1':
 		// Present New account screen
-		
 		break;
 	case '2':
+	{
 		// Present login screen and track attempts
 		unsigned short attempt = 0;
-		string username = "", password = "";
+		string username;
+		string password;
 		Customer account;
-		while(attempt < 3 && account.isOpen())
+		while(attempt < 3 && !account.isOpen())
 		{
 			cout << "Username: ";
 			cin >> username;
 			cout << "Password: ";
 			cin >> password;
-			
-			i++;
-			account = login(username,password);
+
+			attempt++;
+			try {
+				account = login( username, password );
+			}
+			catch( string s )
+			{
+				cout << s << endl;
+			}
 		}
 		break;
+	}
 	case '3':
 		// Do nothing because quiting.
 		break;
