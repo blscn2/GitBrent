@@ -104,12 +104,12 @@ Customer::~Customer(){
 void Customer::Withdrawal(){
 	cout << "Current account balance: $" << balance << endl << "How much would you like to withdraw?" << endl;
 	cin >> amount;
-	try {
+//	try {
 		if( amount > balance ) {
 			throw "Unable to process this transaction. (Withdrawal of this size would result in negative balance";
 		}
 		balance -= amount;
-	}
+//	}
 }
 
 void Customer::Deposit(){
@@ -191,29 +191,38 @@ Person* login( string user, string pass ) throw(char)
 //============================ Main ==========================================
 int main(int argc, char* argv[])
 {
-	char choice = '0';
+	string choice;
 	
 	// Output welcome message and primary menu
 	cout << "Welcome to "<<endl;
 	do {
+		try {
+			cout << "How might we be of service?\n"
+				<< "1) Open new account\n"
+				<< "2) Login\n"
+				<< "3) Quit" << endl;
+			cin >> choice;
+
+			if( choice.length() > 1 )
+				throw "I'm sorry. That is not an option\nPlease choose again.\n";
+			cout << "one" << endl;
+				// Check for bad input
+			if( choice.at(0) < '1' || choice.at(0) > '3' )
+				throw "I'm sorry. That is not an option.\nPlease choose again\n";
+			cout << "two" << endl;
 		
-		cout << "How might we be of service?\n"
-		     << "1) Open new account\n"
-		     << "2) Login\n"
-		     << "3) Quit" << endl;
-		cin >> choice;
-		
-		// Check for bad input
-		if( choice < 49 || choice > 51 )
-		{
-			cout << "I'm sorry. That is not an option.\n"
-			     << "Please choose again\n" << endl;
 		}
+		catch(const char* s)
+		{
+			cout << s << endl;
+			continue;
+		}
+		break;
 	// loop if there was bad input
-	} while(  choice < 49 || choice > 51 );
+	} while( true );
 	
 	//Branch based on menu choice.
-	switch(choice)
+	switch(choice.at(0))
 	{
 	case '1':
 		// Present New account screen
@@ -224,7 +233,7 @@ int main(int argc, char* argv[])
 		unsigned short attempt = 0;
 		string username;
 		string password;
-		Person* account = NULL;
+		Person* account;
 		do
 		{
 			cout << "Username: ";
@@ -255,7 +264,7 @@ int main(int argc, char* argv[])
 				}
 			}
 			break;
-		} while( attempt < 3 );
+		} while( attempt < 3);
 		break;
 	}
 	case '3':
