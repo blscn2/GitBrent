@@ -19,10 +19,10 @@ using namespace std;
 //============================ Classes =======================================
 class Person {
 	protected:
-		string name = "John Doe";
-		int accountnumber = 123456;
-		string username;
-		string password;
+		string name; // = "John Doe"
+		int accountnumber; // = 123456;
+		string username; // = "JDoe12"
+		string password; // = "Doe#12Donut"
 
 	public:
 		virtual void printInfo( void ) = 0;
@@ -34,12 +34,13 @@ class Person {
 
 class Customer: public Person {
 	protected:
-		double balance = 356.25;
-		string accounttype = "Standard or student or loyal";
+		double balance; // = 356.25;
+		string accounttype; // = "Standard or student or loyal";
 
 	public:
 		double amount;
 
+		Customer( string, int, string, string, double, string );
 
 		virtual void printInfo(void);
 		void Withdrawal();
@@ -56,7 +57,7 @@ class Customer: public Person {
 Person::Person( )
 {
 	name = "";
-	num = 0;
+	accountnumber = 0;
 }
 
 /*	Parametric constructor
@@ -73,7 +74,7 @@ Person::Person(string n, int num, string user, string pass)
 	Returns is the account has been open: i.e. initialized. */
 bool Person::isOpen( )
 {
-	return ( name.empty ); // I am not completely sure this will give output wanted.
+	return ( name.empty() ); // I am not completely sure this will give output wanted.
 }
 
 /*	Deconstructor
@@ -81,6 +82,12 @@ bool Person::isOpen( )
 Person::~Person( )
 {
 
+}
+
+Customer::Customer( string n, int an, string u, string p, double b, string t ):Person(n,an,u,p)
+{
+	balance = b;
+	accounttype = t;
 }
 
 void Customer::printInfo(void){
@@ -97,8 +104,8 @@ Customer::~Customer(){
 void Customer::Withdrawal(){
 	cout << "Current account balance: $" << balance << endl << "How much would you like to withdraw?" << endl;
 	cin >> amount;
-	try{
-		if( amount > balance){
+	try {
+		if( amount > balance ) {
 			throw "Unable to process this transaction. (Withdrawal of this size would result in negative balance";
 		}
 		balance -= amount;
@@ -119,31 +126,65 @@ void Customer::Options(){
 //============================ Other functions ===============================
 /*	Global funciton
 	Opens fills and checks the information to validate the correct user is there*/
-Person* login( string user, string pass ) throw(string)
+Person* login( string user, string pass ) throw(char)
 {
 	fstream in( "Accounts.txt", fstream::in );
-	
-	string name;
-	string word;
-	char type;
 
-	while( cin >> name >> word >> type )
+	if( !in.is_open( ) )
+		throw 'B';
+	
+	string username; //Username
+	string password; //Password
+	char type; //the kind of person they are.
+
+
+	//Scanf through file looking for correct username and password combination.
+	while( in >> username >> password >> type )
 	{
-		try {
-			if( name == user )
+		if( username == user )
+		{
+			if( password != pass ) // Password does not match username given.
 			{
-				if( word != pass )
-				{
-					throw "Invalid username or password";
-				}
-				else
-					break;
+				throw 'A';
 			}
 			else
-				continue;
+				break;
 		}
+		else
+			continue;
 	}
+	
+	if( in.eof( ) ) // No username matches the one given.
+		throw 'A'; 
 
+	in.close( );
+	
+	// Open that users file
+	in = fstream( "/accounts/" + user, fstream::in );
+	
+	if( !in.is_open( ) )
+		throw 'B';
+
+	string name;
+	int accountnumber;
+	in >> name >> accountnumber;
+
+	//Load in that user
+	switch( type )
+	{
+		case 'C':
+		{
+			string type;
+			double balance;
+			in >> type >> balance;
+			return new Customer( name, accountnumber, username, password, balance, type );
+			break;
+		}
+		case 'E':
+			break;
+		case 'M':
+			break;
+	}
 	return NULL;
 }
 
@@ -158,7 +199,7 @@ int main(int argc, char* argv[])
 		
 		cout << "How might we be of service?\n"
 		     << "1) Open new account\n"
-		     << "2) Login"
+		     << "2) Login\n"
 		     << "3) Quit" << endl;
 		cin >> choice;
 		
@@ -166,7 +207,7 @@ int main(int argc, char* argv[])
 		if( choice < 49 || choice > 51 )
 		{
 			cout << "I'm sorry. That is not an option.\n"
-			     << "Please choose again\n";
+			     << "Please choose again\n" << endl;
 		}
 	// loop if there was bad input
 	} while(  choice < 49 || choice > 51 );
@@ -183,8 +224,8 @@ int main(int argc, char* argv[])
 		unsigned short attempt = 0;
 		string username;
 		string password;
-		Customer account;
-		while(attempt < 3 && !account.isOpen())
+		Person* account = NULL;
+		do
 		{
 			cout << "Username: ";
 			cin >> username;
@@ -195,11 +236,26 @@ int main(int argc, char* argv[])
 			try {
 				account = login( username, password );
 			}
-			catch( string s )
+			catch( char s )
 			{
-				cout << s << endl;
+				switch( s )
+				{
+				case 'A':
+					cout << "Invalid username or password" << endl;
+					continue;
+					break;
+				case 'B':
+					cout << "Our services our currently down. Please try again at another time." << endl;
+					continue;
+					break;
+				default:
+					cerr << "Something went wrong" << endl;
+					continue;
+					break;
+				}
 			}
-		}
+			break;
+		} while( attempt < 3 );
 		break;
 	}
 	case '3':
