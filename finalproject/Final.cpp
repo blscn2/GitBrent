@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 
@@ -168,7 +170,7 @@ Person* login( string user, string pass ) throw(char)
 	string name;
 	int accountnumber;
 	in >> name >> accountnumber;
-
+	
 	//Load in that user
 	switch( type )
 	{
@@ -177,6 +179,7 @@ Person* login( string user, string pass ) throw(char)
 			string type;
 			double balance;
 			in >> type >> balance;
+			in.close( );
 			return new Customer( name, accountnumber, username, password, balance, type );
 			break;
 		}
@@ -185,7 +188,40 @@ Person* login( string user, string pass ) throw(char)
 		case 'M':
 			break;
 	}
+	in.close( );
 	return NULL;
+}
+
+int getNewNumber( )
+{
+	srand( time( NULL ) );
+
+	fstream in( "AccountNums.txt", fstream::in);
+	if( !in.is_open( ) )
+		throw "B";
+	vector<int> nums = {0000000 };
+
+	int temp;
+	while(! in.eof() )
+	{
+		in >> temp;
+		nums.push_back( temp );
+	}
+	in.close( );
+	int newNum;
+	do {
+		newNum = rand( );
+		int i;
+		for( i = 0; i < nums.size( ); i++ )
+			if( newNum == nums[i])
+				continue;
+		break;
+	} while( true );
+	in = fstream( "AccountNums.txt", fstream::app );
+
+	in << newNum << endl;
+	in.close( );
+	return newNum;
 }
 
 //============================ Main ==========================================
@@ -205,12 +241,9 @@ int main(int argc, char* argv[])
 
 			if( choice.length() > 1 )
 				throw "I'm sorry. That is not an option\nPlease choose again.\n";
-			cout << "one" << endl;
 				// Check for bad input
 			if( choice.at(0) < '1' || choice.at(0) > '3' )
-				throw "I'm sorry. That is not an option.\nPlease choose again\n";
-			cout << "two" << endl;
-		
+				throw "I'm sorry. That is not an option.\nPlease choose again\n";		
 		}
 		catch(const char* s)
 		{
@@ -221,19 +254,50 @@ int main(int argc, char* argv[])
 	// loop if there was bad input
 	} while( true );
 	
+
+	Person* account;
 	//Branch based on menu choice.
 	switch(choice.at(0))
 	{
 	case '1':
-		// Present New account screen
+	{	// Present New account screen
+		string n;
+		string u;
+		string p, p2;
+		cout << "Excellent. We just need some information for you to have it open!"
+			<< "What is your name?" << endl;
+		cin >> n;
+		cout << "\nWhat do you want your username to be?" << endl;
+		cin >> u;
+		do {
+			cout << "\nWhat do you want your password to be?" << endl;
+			cin >> p;
+			cout << "\nPlease type that again to make sure we have that right." << endl;
+			cin >> p2;
+			try {
+				if( p != p2 )
+					throw "Those do not match please try again.";
+			}
+			catch( const char* s )
+			{
+				cout << s << endl;
+				continue;
+			}
+			break;
+		} while( true );
+
+		cout << "Alright just one moment while we initialize your account" << endl;
+		account = new Customer( n, getNewNumber( ), u, p, 0.0, "Standard" );
+
+		cout << "There! Your account will open just like you just logged on.\nThank you" << endl;
 		break;
+	}
 	case '2':
 	{
 		// Present login screen and track attempts
 		unsigned short attempt = 0;
 		string username;
 		string password;
-		Person* account;
 		do
 		{
 			cout << "Username: ";
@@ -269,12 +333,15 @@ int main(int argc, char* argv[])
 	}
 	case '3':
 		// Do nothing because quiting.
+		cout << "Thank you!" << endl;
+		return 0;
 		break;
 	default:
 		cerr << "Computer malfunction. Exiting!\n"<<endl;
 		break;
 	}
 	
+	account->printInfo( );
 	cout << "Thank you!" <<endl;
 	return 0;
 }
