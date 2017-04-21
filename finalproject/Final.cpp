@@ -29,6 +29,7 @@ class Person {
 	public:
 		virtual void printInfo( void ) = 0;
 		bool isOpen( );
+		virtual void Options( ) = 0;
 		Person( );
 		Person( string , int, string, string);
 		~Person( );
@@ -123,7 +124,41 @@ void Customer::Deposit(){
 }
 
 void Customer::Options(){
+	string choice;
+	do {
+		cout << "What do ou want to do?\n"
+			<< "1) Deposit\n"
+			<< "2) Withdraw\n"
+			<< "3) Close the account(Not functional)\n"
+			<< "4) Exit" << endl;
+		cin >> choice;
+		try {
+			if( choice.length( ) > 1 )
+				throw "I'm sorry. That is not an option.\nPlease choose again\n";
+			if( choice.at( 0 ) < '1' || choice.at( 0 ) > '4' )
+				throw "I'm sorry. That is not an option.\nPlease choose again\n";
+		}
+		catch( const char* s )
+		{
+			cout << s << endl;
+			continue;
+		}
+		break;
+	} while( true );
 
+	switch( choice.at( 0 ) )
+	{
+	case '1':
+		break;
+	case '2':
+		break;
+	case '3':
+		break;
+	case '4':
+		break;
+	default:
+		throw "Something went wrong. Exiting!";
+	}
 }
 
 //============================ Other functions ===============================
@@ -333,16 +368,24 @@ int main(int argc, char* argv[])
 		break;
 	}
 	case '3':
-		// Do nothing because quiting.
+		// Completely exit as one has not opened anything.
 		cout << "Thank you!" << endl;
 		return 0;
 		break;
 	default:
 		cerr << "Computer malfunction. Exiting!\n"<<endl;
+		return 1;
 		break;
 	}
 	
 	account->printInfo( );
+	try {
+		account->Options( );
+	}
+	catch( const char * )
+	{
+
+	}
 	cout << "Thank you!" <<endl;
 	return 0;
 }
