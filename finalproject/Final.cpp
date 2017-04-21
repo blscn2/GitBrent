@@ -3,7 +3,7 @@
 // Author      : Brent Schultz, Shayne Wadle
 // Version     :
 // Copyright   : Your copyright notice
-// Description : Final Project
+// Description : Final Project     -std=c++11
 //============================================================================
 
 #include <stdio.h>
@@ -85,13 +85,13 @@ Person::~Person( )
 {
 
 }
-
+// Constructor
 Customer::Customer( string n, int an, string u, string p, double b, string t ):Person(n,an,u,p)
 {
 	balance = b;
 	accounttype = t;
 }
-
+/* Prints account information and balance */
 void Customer::printInfo(void){
 	cout << "Account holder name: " << name << endl;
 	cout << "Account number: " << accountnumber << endl;
@@ -109,32 +109,52 @@ Customer::~Customer(){
 	userFile.close( );
 	cout << "Account closed." << endl;
 }
-
+// Allows customer to withdraw from account
 void Customer::Withdrawal(){
 	cout << "Current account balance: $" << balance << endl << "How much would you like to withdraw?" << endl;
 	cin >> amount;
-//	try {
-		if( amount > balance ) {
-			throw "Unable to process this transaction. (Withdrawal of this size would result in negative balance";
+	int yon;
+	if( amount > balance ) {
+		cout << "Withdrawal of this size will result in negative balance. Do you still wish to withdraw this amount?" << endl;
+		cout << "Type 1 for yes or 2 for no." << endl;
+		cin >> yon;
+		if (yon == 1){
+			balance = balance - amount - 30;
 		}
-		balance -= amount;
-//	}
+		else if (yon == 2){
+			cout << "Cancelling withdrawal. Your balance is still $" << balance << endl;
+		}
+		else{
+			cout << "Invalid choice. Cancelling withdrawal." << endl;
+		}
+		break;
+	}
+	balance -= amount;
+	cout << "Your new balance is: $" << balance << endl;
 }
-
+// Allows customer to make a deposit
 void Customer::Deposit(){
-	cout << "Current acount balance: $" << balance << endl << "How much would you like to deposit?" << endl;
+	cout << "Current account balance: $" << balance << endl << "How much would you like to deposit?" << endl;
 	cin >> amount;
+	if( amount < 0){
+		cout << "Cannot deposit negative numbers..."<< endl;
+		break;
+	}
+	if( amount > sizeof(double)){
+		cout << "Our bank can't handle that much money..."<< endl;
+		break;
+	}
 	balance += amount;
 	cout << "Your new balance is: $" << balance << endl;
 }
-
+// Option menu accessible by the customer
 void Customer::Options(){
 	string choice;
 	do {
 		cout << "What do ou want to do?\n"
 			<< "1) Deposit\n"
 			<< "2) Withdraw\n"
-			<< "3) Close the account(Not functional)\n"
+			<< "3) Close the account(Not functional)\n" //Will add more options later (interest,
 			<< "4) Exit" << endl;
 		cin >> choice;
 		try {
@@ -154,12 +174,37 @@ void Customer::Options(){
 	switch( choice.at( 0 ) )
 	{
 	case '1':
+		Deposit();
 		break;
 	case '2':
+		Withdrawal();
 		break;
 	case '3':
+		int accntclose;
+		cout << "Closing your account. All balances will be withdrawn and information destroyed." << endl;
+		cout << "Are you sure you wish to delete the account?\nType:\n1 for yes\n2 for no."<< endl;
+		cin >> accntclose;
+		if (accntclose == 1 ){
+//		delete account;
+		} else if (accntclose == 2){
+			cout << "Account will not be closed. Returning to menu." << endl;
+		} else {
+			cout << "Invalid choice. Try again (one attempt remaining)." << endl;
+			cout << "Are you sure you wish to delete the account?\nType:\n1 for yes\n2 for no."<< endl;
+					cin >> accntclose;
+					if (accntclose == 1 ){
+			//		delete account;
+					} else if (accntclose == 2){
+						cout << "Account will not be closed. Returning to menu." << endl;
+						break;
+					} else {
+						cout << "Invalid choice. Account will not be deleted." << endl;
+					}
+		}
+
 		break;
 	case '4':
+		cout << "Returning to menu." << endl;
 		break;
 	default:
 		throw "Something went wrong. Exiting!";
