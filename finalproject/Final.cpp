@@ -33,6 +33,7 @@ class Person {
 		Person( );
 		Person( string , int, string, string);
 		~Person( );
+		friend save( Person* p );
 };
 
 class Customer: public Person {
@@ -80,8 +81,6 @@ bool Person::isOpen( )
 	return ( name.empty() ); // I am not completely sure this will give output wanted.
 }
 
-/*	Deconstructor
-	Does nothing currently since nothing is dynamically allocated */
 Person::~Person( )
 {
 
@@ -97,11 +96,18 @@ void Customer::printInfo(void){
 	cout << "Account holder name: " << name << endl;
 	cout << "Account number: " << accountnumber << endl;
 	cout << "Account balance: $" << balance << endl;
-	cout << "Account type: " << accounttype << endl;
+	cout << "Account type: " << accounttype <<"\n"<< endl;
 }
 
 Customer::~Customer(){
+	fstream userFile( "accounts\\" + username + ".txt", fstream::trunc | fstream::out );
 
+	userFile << username << " " << password << " C" << endl;
+	userFile << name << "\n" << accountnumber << endl;
+	userFile << accounttype << " " << balance << endl;
+
+	userFile.close( );
+	cout << "Account closed." << endl;
 }
 
 void Customer::Withdrawal(){
@@ -163,48 +169,27 @@ void Customer::Options(){
 //============================ Other functions ===============================
 /*	Global funciton
 	Opens fills and checks the information to validate the correct user is there*/
-Person* login( string user, string pass ) throw(char)
+Person* login( string user, string pass, char* t ) throw(char)
 {
-	fstream in( "Accounts.txt", fstream::in );
+	fstream in( "accounts/" + user + ".txt", fstream::in );
 
 	if( !in.is_open( ) )
-		throw 'B';
+		throw 'A';
 	
 	string username; //Username
 	string password; //Password
 	char type; //the kind of person they are.
 
-
-	//Scanf through file looking for correct username and password combination.
-	while( in >> username >> password >> type )
+	in >> username >> password >> type;
+	if( password != pass ) // Password does not match username given.
 	{
-		if( username == user )
-		{
-			if( password != pass ) // Password does not match username given.
-			{
-				throw 'A';
-			}
-			else
-				break;
-		}
-		else
-			continue;
+		throw 'A';
 	}
-	
-	if( in.eof( ) ) // No username matches the one given.
-		throw 'A'; 
-
-	in.close( );
-	
-	// Open that users file
-	in = fstream( "/accounts/" + user, fstream::in );
-	
-	if( !in.is_open( ) )
-		throw 'B';
-
+	in >> ws;
 	string name;
 	int accountnumber;
-	in >> name >> accountnumber;
+	getline( in, name );
+	in >> accountnumber;
 	
 	//Load in that user
 	switch( type )
@@ -215,6 +200,7 @@ Person* login( string user, string pass ) throw(char)
 			double balance;
 			in >> type >> balance;
 			in.close( );
+			*t = 'C';
 			return new Customer( name, accountnumber, username, password, balance, type );
 			break;
 		}
@@ -291,6 +277,7 @@ int main(int argc, char* argv[])
 	
 
 	Person* account;
+	char type;
 	//Branch based on menu choice.
 	switch(choice.at(0))
 	{
@@ -299,11 +286,20 @@ int main(int argc, char* argv[])
 		string n;
 		string u;
 		string p, p2;
-		cout << "Excellent. We just need some information for you to have it open!"
+		cout << "\nExcellent. We just need some information for you to have it open!\n"
 			<< "What is your name?" << endl;
-		cin >> n;
-		cout << "\nWhat do you want your username to be?" << endl;
-		cin >> u;
+		cin >> ws;
+		getline( cin, n );
+		fstream in;
+		do {
+			in.close( );
+			cout << "\nWhat do you want your username to be?" << endl;
+			cin >> u;
+			in.open( "accounts/" + u + ".txt", fstream::in);
+			if( in.is_open( ) )
+				cout << "I'm sorry. That username has already been taken." << endl;
+		} while( in.is_open( ) );
+		in.close( );
 		do {
 			cout << "\nWhat do you want your password to be?" << endl;
 			cin >> p;
@@ -321,10 +317,10 @@ int main(int argc, char* argv[])
 			break;
 		} while( true );
 
-		cout << "Alright just one moment while we initialize your account" << endl;
+		cout << "\nAlright just one moment while we initialize your account" << endl;
 		account = new Customer( n, getNewNumber( ), u, p, 0.0, "Standard" );
-
-		cout << "There! Your account will open just like you just logged on.\nThank you" << endl;
+		type = 'C';
+		cout << "There! Your account will open just like you just logged on.\nThank you\n" << endl;
 		break;
 	}
 	case '2':
@@ -335,14 +331,15 @@ int main(int argc, char* argv[])
 		string password;
 		do
 		{
-			cout << "Username: ";
+			cout << "\nUsername: ";
 			cin >> username;
 			cout << "Password: ";
 			cin >> password;
+			cout << endl;
 
 			attempt++;
 			try {
-				account = login( username, password );
+				account = login( username, password, &type );
 			}
 			catch( char s )
 			{
@@ -364,6 +361,12 @@ int main(int argc, char* argv[])
 			}
 			break;
 		} while( attempt < 3);
+		if( attempt == 3 )
+		{
+			cout << "You have exceeded maximum number of login attempts\n"
+				<< "Exiting!" << endl;
+			return 3;
+		}
 		break;
 	}
 	case '3':
@@ -383,8 +386,27 @@ int main(int argc, char* argv[])
 	}
 	catch( const char * )
 	{
-
+		cout << "I'm sorry something went wrong.\n"
+			<< "Your account will stay as it was when this program was openned.\n"
+			<< "Please try again at a later time." << endl;
+		return 2;
 	}
+
+	cout << endl;
+	switch( type )
+	{
+	case 'C':
+		delete (Customer*) account;
+		break;
+	case 'E':
+		break;
+	case 'M':
+		break;
+	default:
+		delete account;
+		break;
+	}
+
 	cout << "Thank you!" <<endl;
 	return 0;
 }
