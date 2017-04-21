@@ -106,16 +106,17 @@ Customer::~Customer(){
 void Customer::Withdrawal(){
 	cout << "Current account balance: $" << balance << endl << "How much would you like to withdraw?" << endl;
 	cin >> amount;
-//	try {
-		if( amount > balance ) {
-			throw "Unable to process this transaction. (Withdrawal of this size would result in negative balance";
-		}
-		balance -= amount;
-//	}
+
+	if( amount > balance ) {
+		cout << "Unable to process this transaction. (Withdrawal of this size would result in negative balance)" << endl;
+		return;
+	}
+	balance -= amount;
+
 }
 
 void Customer::Deposit(){
-	cout << "Current acount balance: $" << balance << endl << "How much would you like to deposit?" << endl;
+	cout << "Current account balance: $" << balance << endl << "How much would you like to deposit?" << endl;
 	cin >> amount;
 	balance += amount;
 	cout << "Your new balance is: $" << balance << endl;
