@@ -33,7 +33,6 @@ class Person {
 		Person( );
 		Person( string , int, string, string);
 		~Person( );
-		friend save( Person* p );
 };
 
 class Customer: public Person {
@@ -119,15 +118,16 @@ void Customer::Withdrawal(){
 		cout << "Type 1 for yes or 2 for no." << endl;
 		cin >> yon;
 		if (yon == 1){
-			balance = balance - amount - 30;
+			balance -= 30;
 		}
 		else if (yon == 2){
 			cout << "Cancelling withdrawal. Your balance is still $" << balance << endl;
+			return;
 		}
 		else{
 			cout << "Invalid choice. Cancelling withdrawal." << endl;
+			return;
 		}
-		break;
 	}
 	balance -= amount;
 	cout << "Your new balance is: $" << balance << endl;
@@ -138,11 +138,7 @@ void Customer::Deposit(){
 	cin >> amount;
 	if( amount < 0){
 		cout << "Cannot deposit negative numbers..."<< endl;
-		break;
-	}
-	if( amount > sizeof(double)){
-		cout << "Our bank can't handle that much money..."<< endl;
-		break;
+		return;
 	}
 	balance += amount;
 	cout << "Your new balance is: $" << balance << endl;
@@ -185,7 +181,7 @@ void Customer::Options(){
 		cout << "Are you sure you wish to delete the account?\nType:\n1 for yes\n2 for no."<< endl;
 		cin >> accntclose;
 		if (accntclose == 1 ){
-//		delete account;
+//		delete account; accounts/username.txt set account number to zero
 		} else if (accntclose == 2){
 			cout << "Account will not be closed. Returning to menu." << endl;
 		} else {
@@ -283,7 +279,7 @@ int getNewNumber( )
 				continue;
 		break;
 	} while( true );
-	in = fstream( "AccountNums.txt", fstream::app );
+	in.open( "AccountNums.txt", fstream::app );
 
 	in << newNum << endl;
 	in.close( );
@@ -363,7 +359,7 @@ int main(int argc, char* argv[])
 		} while( true );
 
 		cout << "\nAlright just one moment while we initialize your account" << endl;
-		account = new Customer( n, getNewNumber( ), u, p, 0.0, "Standard" );
+		account = new Customer( n, getNewNumber( ), u, p, 60.0, "Standard" );
 		type = 'C';
 		cout << "There! Your account will open just like you just logged on.\nThank you\n" << endl;
 		break;
