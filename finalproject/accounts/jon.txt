@@ -1,4 +1,4 @@
-jon 123 C
+jon NULL C
 NULL
 0
-Standard 50
+Standard 0

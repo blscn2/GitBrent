@@ -57,7 +57,7 @@ class Customer: public Person {
 		void Deposit();
 		void Invest();
 		void Options();
-		void DeleteAcct(string);
+		void DeleteAcct();
 
 		~Customer();
 
@@ -127,14 +127,14 @@ void Customer::Withdrawal(){
 		cout << "Type 1 for yes or 2 for no.\nTHIS WILL RESULT IN A $30 OVERDRAW FEE!!!" << endl;
 		cin >> yon;
 		if (yon == 1){
-			balance -= 30;
+			balance -= 30; //overdraft fee
 		}
 		else if (yon == 2){
 			cout << "Cancelling withdrawal. Your balance is still $" << balance << endl;
 			return;
 		}
 		else{
-			cout << "Invalid choice. Cancelling withdrawal." << endl;
+			cout << "Invalid choice. Cancelling withdrawal." << endl; //too many invalid attempts
 			return;
 		}
 	}
@@ -196,7 +196,7 @@ void Customer::Options(){
 		cout << "Are you sure you wish to delete the account?\n1) Yes\n2) No"<< endl;
 		cin >> accntclose;
 		if (accntclose == 1 ){
-		DeleteAcct(username);
+		DeleteAcct();
 		} else if (accntclose == 2){
 			cout << "Account will not be closed. Returning to menu." << endl;
 		} else {
@@ -204,7 +204,7 @@ void Customer::Options(){
 			cout << "Are you sure you wish to delete the account?\nType:\n1 for yes\n2 for no."<< endl;
 					cin >> accntclose;
 					if (accntclose == 1 ){
-						DeleteAcct(username);
+						DeleteAcct();
 					} else if (accntclose == 2){
 						cout << "Account will not be closed. Returning to menu." << endl;
 						break;
@@ -228,12 +228,15 @@ void Customer::Options(){
 	cin >> contin;
 	}
 }
-
-void Customer::DeleteAcct(string username){
+// Delete account keeps data but removes accessiblily from customer.
+void Customer::DeleteAcct(){
 		
 		cout << "All account information will be deleted from the system and current balance paid out." << endl;
-//		cout << "Will remove " << username << ".txt file" << endl;
+		cout << "Will remove " << username << ".txt file" << endl;
 		
+		username = "NULL";
+		password = "NULL";
+		balance = 0;
 	
 }	
 
