@@ -146,12 +146,14 @@ void Customer::Deposit(){
 // Option menu accessible by the customer
 void Customer::Options(){
 	string choice;
+
 	int contin = 1;
 	
 	while ( contin == 1){
 	
 	do {
 		cout << "What do you want to do?\n"
+
 			<< "1) Deposit\n"
 			<< "2) Withdraw\n"
 			<< "3) Close the account(Not functional)\n" //Will add more options later (interest,
@@ -442,7 +444,7 @@ int main(int argc, char* argv[])
 			<< "Please try again at a later time." << endl;
 		return 2;
 	}
-	
+
 	cout << endl;
 	switch( type )
 	{
