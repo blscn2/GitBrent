@@ -19,6 +19,7 @@ using namespace std;
 
 
 //============================ Classes =======================================
+/* ABC for the different people that use this system*/
 class Person {
 	protected:
 		string name; // = "John Doe"
@@ -28,24 +29,28 @@ class Person {
 
 	public:
 		virtual void printInfo( void ) = 0;
-		bool isOpen( );
 		virtual void Options( ) = 0;
 		Person( );
 		Person( string , int, string, string);
 		~Person( );
 };
 
+/*The customers of the bank are through this class
+	It inherits off of the ABC Person class
+	The printInfo and Options are unique to the class
+	Those options are also set out as functions of the class.*/
 class Customer: public Person {
-	protected:
+	private:
 		double balance; // = 356.25;
 		string accounttype; // = "Standard or student or loyal";
 
 	public:
+		//Used in the functions as an input variable.
 		double amount;
 
 		Customer( string, int, string, string, double, string );
 
-		virtual void printInfo(void);
+		void printInfo(void);
 		void Withdrawal();
 		void Deposit();
 		void Invest();
@@ -54,6 +59,7 @@ class Customer: public Person {
 		~Customer();
 
 };
+
 //============================ Class functions ================================
 /*	Default constructor
 	Initializes everyting to their zero value */
@@ -73,18 +79,15 @@ Person::Person(string n, int num, string user, string pass)
 	password = pass;
 }
 
-/*	Public function
-	Returns is the account has been open: i.e. initialized. */
-bool Person::isOpen( )
-{
-	return ( name.empty() ); // I am not completely sure this will give output wanted.
-}
-
+/*	Does nothing as nothing is dynamically allocated*/
 Person::~Person( )
 {
 
 }
-// Constructor
+
+/*	Parametric constructor for all the variables of this class.
+	It loads some through the ABC constructor.
+*/
 Customer::Customer( string n, int an, string u, string p, double b, string t ):Person(n,an,u,p)
 {
 	balance = b;
@@ -98,6 +101,9 @@ void Customer::printInfo(void){
 	cout << "Account type: " << accounttype <<"\n"<< endl;
 }
 
+/*	Save the current account information into the
+	file designated by the username in the accounts folder.
+	This overwrites the file if it exists. */
 Customer::~Customer(){
 	fstream userFile( "accounts\\" + username + ".txt", fstream::trunc | fstream::out );
 
@@ -221,7 +227,8 @@ void Customer::Options(){
 
 //============================ Other functions ===============================
 /*	Global funciton
-	Opens fills and checks the information to validate the correct user is there*/
+	Opens fills and checks the information to validate the correct user is there
+	Returns the proper dynamically bound class for each type of person*/
 Person* login( string user, string pass, char* t ) throw(char)
 {
 	fstream in( "accounts/" + user + ".txt", fstream::in );
@@ -234,17 +241,17 @@ Person* login( string user, string pass, char* t ) throw(char)
 	char type; //the kind of person they are.
 
 	in >> username >> password >> type;
-	if( password != pass ) // Password does not match username given.
-	{
+	if( username != user ) // Username is not correct. (Account is deleted)
 		throw 'A';
-	}
+	if( password != pass ) // Password does not match username given.
+		throw 'A';
 	in >> ws;
 	string name;
 	int accountnumber;
 	getline( in, name );
 	in >> accountnumber;
 	
-	//Load in that user
+	//Load in that user through the proper class
 	switch( type )
 	{
 		case 'C':
@@ -266,6 +273,10 @@ Person* login( string user, string pass, char* t ) throw(char)
 	return NULL;
 }
 
+/*	Global function
+	Opens AccountNums.txt and loads them all in.
+	Then generates a random number and checks if it is a repeat
+	repeats process until it finds a new number. */
 int getNewNumber( )
 {
 	srand( time( NULL ) );
@@ -313,18 +324,18 @@ int main(int argc, char* argv[])
 				<< "3) Quit" << endl;
 			cin >> choice;
 
+			// Check for bad input
 			if( choice.length() > 1 )
 				throw "I'm sorry. That is not an option\nPlease choose again.\n";
-				// Check for bad input
 			if( choice.at(0) < '1' || choice.at(0) > '3' )
 				throw "I'm sorry. That is not an option.\nPlease choose again\n";		
 		}
 		catch(const char* s)
 		{
 			cout << s << endl;
-			continue;
+			continue; // if there was bad input this will cause the program to loop again.
 		}
-		break;
+		break; // if there was NOT bad input this will cause the pogram to move on
 	// loop if there was bad input
 	} while( true );
 	
@@ -335,7 +346,7 @@ int main(int argc, char* argv[])
 	switch(choice.at(0))
 	{
 	case '1':
-	{	// Present New account screen
+	{	// Present New account screen and get the information.
 		string n;
 		string u;
 		string p, p2;
@@ -349,7 +360,7 @@ int main(int argc, char* argv[])
 			cout << "\nWhat do you want your username to be?" << endl;
 			cin >> u;
 			in.open( "accounts/" + u + ".txt", fstream::in);
-			if( in.is_open( ) )
+			if( in.is_open( ) ) //if the username is taken, choose a different one
 				cout << "I'm sorry. That username has already been taken." << endl;
 		} while( in.is_open( ) );
 		in.close( );
@@ -359,17 +370,18 @@ int main(int argc, char* argv[])
 			cout << "\nPlease type that again to make sure we have that right." << endl;
 			cin >> p2;
 			try {
-				if( p != p2 )
+				if( p != p2 ) // if the passwords do not match input again.
 					throw "Those do not match please try again.";
 			}
 			catch( const char* s )
 			{
 				cout << s << endl;
-				continue;
+				continue; // This will cause the pogram to loop again.
 			}
-			break;
+			break; // This causes the program to move on.
 		} while( true );
 
+		// Initalize the account.
 		cout << "\nAlright just one moment while we initialize your account" << endl;
 		account = new Customer( n, getNewNumber( ), u, p, 60.0, "Standard" );
 		type = 'C';
@@ -394,7 +406,7 @@ int main(int argc, char* argv[])
 			try {
 				account = login( username, password, &type );
 			}
-			catch( char s )
+			catch( char s )//If bad inputs, try again.
 			{
 				switch( s )
 				{
@@ -413,7 +425,7 @@ int main(int argc, char* argv[])
 				}
 			}
 			break;
-		} while( attempt < 3);
+		} while( attempt < 3); // If exceeded attempts exit.
 		if( attempt == 3 )
 		{
 			cout << "You have exceeded maximum number of login attempts\n"
@@ -433,7 +445,10 @@ int main(int argc, char* argv[])
 		break;
 	}
 	
+	// Display the account information.
 	account->printInfo( );
+
+	//Then display the options and handle that input there.
 	try {
 		account->Options( );
 	}
@@ -446,6 +461,8 @@ int main(int argc, char* argv[])
 	}
 
 	cout << endl;
+
+	//End with deleting the accounts properly.  This also saves them.
 	switch( type )
 	{
 	case 'C':
