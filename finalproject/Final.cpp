@@ -3,8 +3,10 @@
 // Author      : Brent Schultz, Shayne Wadle
 // Version     :
 // Copyright   : Your copyright notice
-// Description : Final Project     -std=c++11
+// Description : Final Project     
 //============================================================================
+
+// COMPILE USING: g++ Final.cpp -std=c++11 //
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,6 +52,7 @@ class Customer: public Person {
 		void Deposit();
 		void Invest();
 		void Options();
+		void DeleteAcct(string);
 
 		~Customer();
 
@@ -187,7 +190,7 @@ void Customer::Options(){
 		cout << "Are you sure you wish to delete the account?\n1) Yes\n2) No"<< endl;
 		cin >> accntclose;
 		if (accntclose == 1 ){
-//		delete account; accounts/username.txt set account number to zero
+		DeleteAcct(username);
 		} else if (accntclose == 2){
 			cout << "Account will not be closed. Returning to menu." << endl;
 		} else {
@@ -195,7 +198,7 @@ void Customer::Options(){
 			cout << "Are you sure you wish to delete the account?\nType:\n1 for yes\n2 for no."<< endl;
 					cin >> accntclose;
 					if (accntclose == 1 ){
-			//		delete account;
+						DeleteAcct(username);
 					} else if (accntclose == 2){
 						cout << "Account will not be closed. Returning to menu." << endl;
 						break;
@@ -203,10 +206,11 @@ void Customer::Options(){
 						cout << "Invalid choice. Account will not be deleted." << endl;
 					}
 		}
-
+		return;
 		break;
 	case '4':
-		cout << "Returning to menu." << endl;
+		cout << "Exiting options." << endl;
+		return;
 		break;
 	default:
 		throw "Something went wrong. Exiting!";
@@ -218,6 +222,14 @@ void Customer::Options(){
 	cin >> contin;
 	}
 }
+
+void Customer::DeleteAcct(string username){
+		
+		cout << "All account information will be deleted from the system and current balance paid out." << endl;
+		cout << "Will remove " << username << ".txt file" << endl;
+		
+		username = "NULL";
+}	
 
 //============================ Other functions ===============================
 /*	Global funciton
@@ -371,7 +383,7 @@ int main(int argc, char* argv[])
 		} while( true );
 
 		cout << "\nAlright just one moment while we initialize your account" << endl;
-		account = new Customer( n, getNewNumber( ), u, p, 60.0, "Standard" );
+		account = new Customer( n, getNewNumber( ), u, p, 00.0, "Standard" );
 		type = 'C';
 		cout << "There! Your account will open just like you just logged on.\nThank you\n" << endl;
 		break;
