@@ -159,7 +159,7 @@ void Customer::Options(){
 
 			<< "1) Deposit\n"
 			<< "2) Withdraw\n"
-			<< "3) Close the account(Not functional)\n" //Will add more options later (interest,
+			<< "3) Close the account\n"
 			<< "4) Exit" << endl;
 		cin >> choice;
 		try {
@@ -226,9 +226,9 @@ void Customer::Options(){
 void Customer::DeleteAcct(string username){
 		
 		cout << "All account information will be deleted from the system and current balance paid out." << endl;
-		cout << "Will remove " << username << ".txt file" << endl;
+//		cout << "Will remove " << username << ".txt file" << endl;
 		
-		username = "NULL";
+	
 }	
 
 //============================ Other functions ===============================
