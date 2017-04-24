@@ -49,7 +49,7 @@ class BaseConic::Circle{
 		double y;
 		double radius;
 
-	public;
+	public:
 		void Move(double nx, double ny){x=nx; y=ny;}
 		virtual double Area() const {return 3.14159 * radius * radius;}
 
