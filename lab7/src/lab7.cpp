@@ -14,20 +14,8 @@
 using namespace std;
 
 // class for a signal
-class Signal{					// FIX MAX READ IN  AND UPDATE CURRENT VECTOR
-	// private members
+class Signal{
 
-	private:
-//		int max;
-//		double average;
-//		//double *data = NULL;
-//		vector<double>data;
-//		int length;
-//		vector<double>array;
-//		//double *array = NULL;
-//		int check;
-
-	// public members and methods
 	public:
 
 		int max;
@@ -67,11 +55,9 @@ int Signal::check_file_success(){
 	//cout << data << endl;
 	if(data.empty()){
 		// File did not load correctly
-		return -1;
-	}else{
-		// file loaded correctly
-		return 0;
+		return 1;
 	}
+	return 0;
 }
 
 // This function writes the transformed signal to a file
@@ -246,7 +232,7 @@ Signal::Signal(int file){
 	// form the file name using the file number
 	if(file<9){
 		sprintf(file_name,"Raw_data_0%d.txt",file);
-	}else{
+	}else if(file >10 && file > 20){
 		sprintf(file_name,"Raw_data_%d.txt",file);
 	}
 
@@ -280,7 +266,7 @@ Signal::Signal(const char * file_name){
 	// open file
 	FILE *fp = fopen(file_name,"r");
 	if (fp == NULL){
-		return;
+		throw 1;
 	}
 	// read in contents
 	fscanf(fp,"%d %d",&length,&max);
@@ -303,12 +289,11 @@ Signal::~Signal(){
 Signal operator+(Signal &one, Signal &two){
 
 	Signal three;
+
 	if( one.length != two.length){ //Error checking to make sure they are same length
-		cout << "\nSignals are not the same length. Exiting." << endl;
+//		cout << "\nSignals are not the same length. Exiting." << endl;
 		return three;
-	} else {
-	// do element additions between one and two and then assign
-	// those values to three's data
+	}
 	for(int i=0;i<one.data.size();i++){
 		three.data.push_back(one.data[i] + two.data[i]);
 	}
@@ -333,12 +318,12 @@ Signal operator+(Signal &one, Signal &two){
 
 	three.average = total/three.data.size();
 
-	cout << "\nThe max is: " << three.max << endl;
-	cout << "The average is: " << three.average << endl;
+	cout << "\nThe max is: " << three.max << endl;      //display max from original signals
+	cout << "The average is: " << three.average << endl; // original
 
 
 	return three;
-	}
+
 }
 
 int main(int argc, char *argv[]){
@@ -392,10 +377,8 @@ int main(int argc, char *argv[]){
 	if(filenumber != 0){
 		sig1 = Signal(filenumber);
 		// check that the file was able to be read from
-		if(sig1.check_file_success() == -1){
-			cout << "File given was not found.\nExiting.\n";
-			return -1;
-		}
+		sig1.check_file_success();
+
 	// otherwise a filename was given
 	}else{
 		// call the constructor
@@ -450,9 +433,29 @@ int main(int argc, char *argv[]){
 				// do scale
 				flag = 2;
 				double scale_num = 0.0;
+				try{
 				cout << "Enter a scale factor: ";
 				cin >> scale_num;
-				//sig1.scale(scale_num);
+					if (scale_num == 0){
+						throw 1;
+					}else if (scale_num < 0){
+						throw "Scale number less than zero";
+					}else if (scale_num >= 10000){
+						throw sig1;
+					}
+				}
+				catch (int a){
+					cout << "Exception thrown.Will use 3.2 instead" << endl;
+					scale_num = 3.2;
+				}
+				catch (const char * s){
+					cout << "Exception for using a negative. Will use scale factor of 2.5 instead."<< endl;
+					scale_num = 2.5;
+				}
+				catch (...){
+					cout << "General exception thrown. Signal will not be scaled." << endl;
+					break;
+				}
 				sig1*scale_num;
 				break;}
 
@@ -482,9 +485,13 @@ int main(int argc, char *argv[]){
 				break;}
 			case 8:{
 				// this is for the non-member addition operator
+
+
 				Signal sig2("Raw_data_01.txt");
+
 				Signal sig3("newdata.txt");
 				Signal added;
+
 
 				added = operator+(sig2,sig3);
 				break;
