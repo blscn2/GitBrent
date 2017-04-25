@@ -15,11 +15,13 @@ using namespace std;
 
 // abstract base class for conic sections
 class BaseConic{
+	//protected variables
 	protected:
 		double x;
 		double y;
 		double radius1;
 
+	//public functions and constructors/destructor
 	public:
 		BaseConic(double x0 = 0.0, double y0 = 0.0);
 		virtual ~BaseConic();
@@ -29,23 +31,27 @@ class BaseConic{
 
 };
 
+// Shifts the shape by the x and y given
 void BaseConic::Move(double nx, double ny){
 	x = nx + x;
 	y = nx + y;
 }
 
+// Virtual function to display baseclass
 void BaseConic::Display(){
 	cout << "Coordinates: (" << x << ", " << y << ")" << endl
 	 << "Radius: " << radius1 << endl
 	 << "Area of shape: " << Area() << " units sq \n" << endl;
 }
 
+// Constructor with parameters given
 BaseConic::BaseConic(double x0, double y0){
 	x = x0;
 	y = y0;
 	radius1 = 0;
 }
 
+// Destructor
 BaseConic::~BaseConic(){
 
 }
@@ -98,6 +104,7 @@ void Ellipse::Display(){
 	cout << "Coordinates: (" << x << ", " << y << ")" << endl
 		 << "XRadius: " << radius1 << endl
 		 << "YRadius: "<< radius2 << endl
+//		 << "Angle: " << theta << " degrees" << endl
 		 << "Area of shape: " << Area() << " units sq \n" << endl;
 }
 
@@ -165,7 +172,18 @@ int main(){
 		cout << "Using 0 or negative radii is unacceptable " << endl;
 		return 0;
 	}
+
+//	BaseConic cone1(rad1);
+
+	BaseConic* mmm;
+	//Create circle and demonstrate functions
 	Circle circle1(rad1);
+
+	mmm = &circle1;
+
+	mmm->Display();
+
+
 	cout << "Original Circle: " << endl;
 	circle1.Display();
 	circle1.Move(5,5);
@@ -193,6 +211,9 @@ int main(){
 			cout << "Using 0 or negative radii is unacceptable " << endl;
 			return 0;
 		}
+
+
+	//Create ellipse and demonstrate functions
 	Ellipse ellipse1(rad1, rad2);
 	cout << "Original Ellipse: " << endl;
 	ellipse1.Display();
