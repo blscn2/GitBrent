@@ -196,14 +196,22 @@ void Signal::operator*(double scale_factor){
 
 //This function centers the signal
 void Signal::center(Signal x){
+
+	if(length == 0){
+		throw 1;
+	}
 	// Since centering is the same as offsetting the signal by a factor
 	// of -mean, the offset can be used with an offset value of -mean
-	cout << "Centering data" << endl;
+	cout << "Centering data"<< length<< "is length" << endl;
 	x + (-average);
 }
 
 // This function normalizes the singal
 void Signal::normalize(Signal x){
+
+	if(length == 0){
+		throw 1;
+	}
 	// Since normalizing is the same as scaling the signal by a factor
 	// of 1/max, the scaleSignal() function can be used with a scale value of 1/max
 	cout << "Normalizing data" << endl;
@@ -243,7 +251,10 @@ Signal::Signal(int file){
 	}
 
 	// read in contents
+
 	fscanf(fp,"%d %d",&length,&max);
+	if ( length <= 0 )
+		length = 0;
 	//data = new double [length];
 	for(i=0;i<length;i++){
 		fscanf(fp,"%lf",&cell);
@@ -270,6 +281,10 @@ Signal::Signal(const char * file_name){
 	}
 	// read in contents
 	fscanf(fp,"%d %d",&length,&max);
+
+	if ( length <= 0 )
+		length = 0;
+
 	//data = new double [length];
 	for(i=0;i<length;i++){
 		fscanf(fp,"%lf",&cell);
@@ -404,7 +419,7 @@ int main(int argc, char *argv[]){
 
 
     // User menu
-	while(1){
+	while( choice != 7){
 		// ask the user to pick what they would like to do
 		cout << "\nSelect:\n(0) Get Info\n(1) Offset\n(2) Scale\n(3) Center\n(4) Normalize\n(5) Statistic\n(6) Save To File\n(7) Exit\n(8) Add two Signals\n> ";
 		cin >> choice;
@@ -412,8 +427,8 @@ int main(int argc, char *argv[]){
 			cout <<"Invalid. Enter again: ";
 			cin >> choice;
 		}
-
-		// based on their choice, call the correct method
+		try{
+		// try exception handling
 		switch(choice){
 			case 0:{
 				// display info
@@ -432,28 +447,29 @@ int main(int argc, char *argv[]){
 			case 2: {
 				// do scale
 				flag = 2;
-				double scale_num = 0.0;
+				double scale_num = 0.0;           // LAB 10 STUFF HERE
 				try{
-				cout << "Enter a scale factor: ";
-				cin >> scale_num;
+					cout << "Enter a scale factor: ";
+					cin >> scale_num;
 					if (scale_num == 0){
 						throw 1;
 					}else if (scale_num < 0){
 						throw "Scale number less than zero";
 					}else if (scale_num >= 10000){
 						throw sig1;
-					}
+						}
 				}
-				catch (int a){
-					cout << "Exception thrown.Will use 3.2 instead" << endl;
+				catch (int a){ //Catch if scale is zero
+					cout << "Exception thrown. Scale can not be zero. Will use 3.2 instead" << endl;
 					scale_num = 3.2;
 				}
-				catch (const char * s){
+				catch (const char * s){ //Catch negative exception
 					cout << "Exception for using a negative. Will use scale factor of 2.5 instead."<< endl;
 					scale_num = 2.5;
 				}
-				catch (...){
-					cout << "General exception thrown. Signal will not be scaled." << endl;
+				catch (...){		//Catch all exception
+					cout << "Exception for using too large scale value." << endl;
+					throw "General Exception in Case 2";
 					break;
 				}
 				sig1*scale_num;
@@ -462,13 +478,25 @@ int main(int argc, char *argv[]){
 			case 3:{
 				// do center
 				flag = 3;
-				sig1.center(sig1);
+				try{
+					sig1.center(sig1);
+				}
+				catch(int empty){
+					cout<< "Empty signal. (IN CASE FOR CENTER ITSELF)" << endl;
+					throw 1;
+				}
 				break;}
 
 			case 4:{
 				// do normalize
 				flag = 4;
-				sig1.normalize(sig1);
+				try{
+					sig1.normalize(sig1);
+				}
+				catch(int empty){
+					cout<< "Empty signal.(IN CASE FOR NORMALIZE ITSELF)" << endl;
+					throw 1;
+				}
 				break;}
 			case 5:{
 				// create statistics file
@@ -502,6 +530,19 @@ int main(int argc, char *argv[]){
 				break;
 				}
 
+		}
+		}
+		catch(int b){
+			cout << "Empty file. (AT END OF WHILE LOOP)" << endl;
+			return 0;
+		}
+		catch(const char * s){
+			cout << s << endl;
+			return 0;
+		}
+		catch(...){
+			cout << "General Exception." << endl;
+			return 0;
 		}
 	}
 	return 0;
