@@ -77,11 +77,13 @@ class Loan {
 private:
 	double balance;
 	double rate;
-	Customer client;
+	Customer* client;
 public:
 	void display( );
 	void interest( );
 	void paySome( double amount );
+	Loan( string, double, double );
+	~Loan( );
 };
 
 class Manager: public Employee {
@@ -333,9 +335,64 @@ Manager::Manager( string n, int an, string u, string p ) throw(char): Employee( 
 	}
 	in.close( );
 
-	in.open("stuff.txt" );
+	i = 0;
+	in.open( "loans/" + to_string(i) + ".txt" );
+	while( in.is_open( ) )
+	{
+		double b, r;
+		string user;
+		in >> user >> b >> r;
+		investments.push_back( Loan( user, b, r ) );
 
+		in.close( );
+		i++;
+		in.open( "loans/" + to_string(i) + ".txt" );
+	}
+	in.close( );
 }
+
+
+
+//=================== Loan functions ======================
+void Loan::display( )
+{
+	client ->printInfo( );
+	cout << "currently has a loan out for\n"
+		<< balance << " at a rate of " << rate << endl << endl;
+}
+void Loan::interest( )
+{
+	balance *= ( 1 + rate );
+}
+void Loan::paySome( double amount )
+{
+	balance -= amount;
+}
+Loan::Loan( string u, double b, double r )
+{
+	fstream in( "accounts/" + u + ".txt" );
+	if( !in.is_open( ) )
+		throw 'C';
+
+	string p, n, type;
+	double bal;
+	char t;
+	int a;
+	in >> u >> p >> t >>ws;
+	getline( in, n );
+	in >> a >> type >> b;
+
+	in.close( );
+	client = new Customer( n, a, u, p, bal,type );
+	balance = b;
+	rate = r;
+}
+
+Loan::~Loan( )
+{
+	delete client;
+}
+
 
 
 //============================ Other functions ===============================
