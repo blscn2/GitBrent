@@ -63,6 +63,39 @@ class Customer: public Person {
 
 };
 
+class Employee: public Person {
+public:
+	void printInfo( );
+	virtual void Options( );
+	void openPayRoll( );
+	void controlAccounts( );
+	void viewStats( );
+	Employee( string, int, string, string );
+};
+
+class Loan {
+private:
+	double balance;
+	double rate;
+	Customer client;
+public:
+	void display( );
+	void interest( );
+	void paySome( double amount );
+};
+
+class Manager: public Employee {
+private:
+	vector<Loan> investments;
+	vector<Employee> staff;
+public:
+	void Options( );
+	void controlStaff( );
+	void investClient( );
+	void createPayRoll( );
+	Manager( string, int, string, string ) throw(char);
+};
+
 //============================ Class functions ================================
 /*	Default constructor
 	Initializes everyting to their zero value */
@@ -239,6 +272,71 @@ void Customer::DeleteAcct(){
 		balance = 0;
 	
 }	
+
+
+Employee::Employee( string n, int an, string u, string p ): Person( n, an, u, p )
+{
+
+}
+
+void Employee::printInfo( )
+{
+	return;
+}
+
+void Employee::Options( )
+{
+	return;
+}
+
+//========= Manager functions ================
+void Manager::Options( )
+{
+
+}
+void Manager::controlStaff( )
+{
+
+}
+void Manager::investClient( )
+{
+
+}
+void Manager::createPayRoll( )
+{
+
+}
+Manager::Manager( string n, int an, string u, string p ) throw(char): Employee( n, an, u, p )
+{
+	fstream in( "Employees.txt", fstream::in );
+	if( !in.is_open( ) )
+		throw 'A';
+
+	int num;
+	in >> num;
+
+	int i;
+	fstream employIn;
+	string user, pass, name;
+	char t;
+	int account;
+
+	for( i = 0; i < num; i++ )
+	{
+		in >> user;
+		employIn.open( "accounts/" + user + ".txt", fstream::in );
+		employIn >> user >> pass >> t >> ws;
+		getline( employIn, name );
+		in >> account;
+		staff.push_back( Employee( name, account, user, pass ) );
+		employIn.close( );
+	}
+	in.close( );
+
+	in.open("stuff.txt" );
+
+}
+
 
 //============================ Other functions ===============================
 /*	Global funciton
