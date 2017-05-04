@@ -91,23 +91,10 @@ class Loan {
 		void display( );
 		void interest( );
 		void paySome( double amount );
+		bool isIssuedTo( string );
 		string save( );
 		Loan( string, double, double );
 		~Loan( );
-
-private:
-	double balance;
-	double rate;
-	Customer* client;
-public:
-	void display( );
-	void interest( );
-	void paySome( double amount );
-	bool isIssuedTo( string );
-	string save( );
-	Loan( string, double, double );
-	~Loan( );
-
 };
 
 class Manager: public Employee {
@@ -230,7 +217,7 @@ void Customer::Options(){
 
 			<< "1) Deposit\n"
 			<< "2) Withdraw\n"
-			<< "3) Close the account\n""
+			<< "3) Close the account\n"
 			<< "4) Exit" << endl;
 		cin >> choice;
 		try {
@@ -249,7 +236,6 @@ continue;
 
 	switch( choice.at( 0 ) )
 	{
-<<<<<<< HEAD
 	case '1':
 		Deposit();
 		break;
@@ -280,12 +266,9 @@ continue;
 		}
 		return;
 		break;
-	case '5':
+	case '4':
 		cout << "Exiting options." << endl;
 		return;
-		break;
-	case '4':
-		printInfo();
 		break;
 	default:
 		throw "Something went wrong. Exiting!";
@@ -322,14 +305,29 @@ Employee::Employee( string n, int an, string u, string p ): Person( n, an, u, p 
 
 void Employee::printInfo( )
 {
+	cout << "STUFF PRINT INFO" << endl;
 	return;
 }
 
 void Employee::Options( )
 {
+	cout << "EMPLOYEE OPTIONS" << endl;
 	return;
 }
 
+void Employee::controlAccounts()
+{
+	cout << "CONTROL ACCOUNTS" << endl;
+	return;
+}
+
+void Employee::viewStats()
+{
+	cout << "VIEW STATS" << endl;
+	return;
+}
+
+	
 void Employee::openPayRoll( ) {
 	fstream in( "payroll.txt", fstream::in );
 	string u;
@@ -414,10 +412,10 @@ void Manager::Options( )
 	switch( choice.at( 0 ) )
 	{
 		case '1':
-			ControlAccounts( );
+			controlAccounts( );
 			break;
 		case '2':
-			ViewStats( );
+			viewStats( );
 			break;
 		case '3':
 			controlStaff( );
@@ -444,17 +442,17 @@ void Manager::controlStaff( )
 			<< "a) Add a new employee\n"
 			<< "b) Remove an employee from the system\n" << endl;
 		cin >> choice;
-		try {
-			if( choice.size( ) > 1 )
-				cerr << "Only the first character is being looked at";
-			if( choice.at(0) < 'a' || choice.at(0) > 'b' )
-				throw "That is not an option\nPlease choose again";
-		}
-		catch( const char* s )
-		{
-			cout << s << endl;
-			continue;
-		}
+//		try {
+//			if( choice.size( ) > 1 )
+//				cerr << "Only the first character is being looked at";
+//			if( choice.at(0) < 'a' || choice.at(0) > 'b' )
+//				throw "That is not an option\nPlease choose again";
+//		}
+//		catch( const char* s )
+//		{
+//			cout << s << endl;
+//			continue;
+//		}
 		break;
 	} while( true );
 
