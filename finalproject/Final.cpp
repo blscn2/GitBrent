@@ -16,6 +16,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
+#include <dirent.h>
 
 using namespace std;
 
@@ -307,8 +308,20 @@ void Employee::printInfo( )
 {
 	string nme;
 	int x;
-	cout << "Client account usernames:" << endl;
+	cout << "Client account filenames:" << endl;
 	
+	DIR *dir;
+	struct dirent *ent;
+	if(( dir = opendir("accounts\\")) != NULL){
+		while((ent = readdir (dir)) != NULL ){
+			printf("%s\n", ent->d_name);
+		}
+		closedir (dir);
+	} else{
+			perror("Unable to open");
+	}		
+	
+	cout << endl;
 	return;
 }
 
@@ -410,7 +423,8 @@ void Employee::openPayRoll( ) {
 void Manager::Options( )
 {
 	string choice;
-
+	
+	while (1){
 	do {
 		cout << "What do you want to do?\n"
 			<< "1) Close client accounts\n"
@@ -433,7 +447,8 @@ void Manager::Options( )
 		}
 		break;
 	} while( true );
-
+	
+	
 	switch( choice.at( 0 ) )
 	{
 		case '1':
@@ -453,9 +468,11 @@ void Manager::Options( )
 			break;
 		case '6':
 			cout << "Returning to main menu\n" << endl;
+			return;
 			break;
 		default:
 			throw "Something went wrong. Exiting!";
+	}
 	}
 
 }
