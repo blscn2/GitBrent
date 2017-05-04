@@ -63,6 +63,23 @@ class Customer: public Person {
 
 };
 
+class Employee: public Person {
+
+	public:
+		
+		Employee( string, int, string, string);
+		
+		void printInfo(void);
+		void Options();
+		void OpenPayRoll();
+		void ControlAccounts();
+		void ViewStats();
+		
+
+		~Employee();
+
+};	
+	
 //============================ Class functions ================================
 /*	Default constructor
 	Initializes everyting to their zero value */
@@ -123,8 +140,12 @@ void Customer::Withdrawal(){
 	cin >> amount;
 	int yon;
 	if( amount > balance ) {
+		if ( amount > balance + 100){
+				cout << "This withdrawal will result in outstanding negative balance.\nCancelling the withdrawal" << endl;
+				return;
+		}	
 		cout << "Withdrawal of this size will result in negative balance. \nDo you still wish to withdraw this amount?" << endl;
-		cout << "Type 1 for yes or 2 for no.\nTHIS WILL RESULT IN A $30 OVERDRAW FEE!!!" << endl;
+		cout << "1) Yes\n2) No\nTHIS WILL RESULT IN A $30 OVERDRAW FEE!!!" << endl;
 		cin >> yon;
 		if (yon == 1){
 			balance -= 30; //overdraft fee
@@ -166,7 +187,8 @@ void Customer::Options(){
 			<< "1) Deposit\n"
 			<< "2) Withdraw\n"
 			<< "3) Close the account\n"
-			<< "4) Exit" << endl;
+			<< "4) Account Info\n"
+			<< "5) Exit" << endl;
 		cin >> choice;
 		try {
 			if( choice.length( ) > 1 )
@@ -214,9 +236,12 @@ void Customer::Options(){
 		}
 		return;
 		break;
-	case '4':
+	case '5':
 		cout << "Exiting options." << endl;
 		return;
+		break;
+	case '4':
+		printInfo();
 		break;
 	default:
 		throw "Something went wrong. Exiting!";
@@ -231,14 +256,48 @@ void Customer::Options(){
 // Delete account keeps data but removes accessiblily from customer.
 void Customer::DeleteAcct(){
 		
-		cout << "All account information will be deleted from the system and current balance paid out." << endl;
-		cout << "Will remove " << username << ".txt file" << endl;
+	cout << "All account information will be deleted from the system and current balance paid out." << endl;
 		
-		username = "NULL";
-		password = "NULL";
-		balance = 0;
+	fstream userFile( "accounts\\" + username + ".txt", fstream::trunc | fstream::out );
+	username = "NULL";
+	password = "NULL";
+	balance = 0;
+	
+	userFile << username << " " << password << " C" << endl;
+	userFile << name << "\n" << accountnumber << endl;
+	userFile << accounttype << " " << balance << endl;
+	
+	userFile.close( );
+}	
+
+
+
+Employee::Employee( string n, int an, string u, string p):Person(n,an,u,p){
+
+}
+
+void Employee::printInfo(){	
+	
+}
+
+void Employee::Options(){
+	
+}
+
+void Employee::OpenPayRoll(){
 	
 }	
+
+void Employee::ControlAccounts(){
+	
+}
+
+void Employee::ViewStats(){
+
+}
+
+
+
 
 //============================ Other functions ===============================
 /*	Global funciton
@@ -280,6 +339,11 @@ Person* login( string user, string pass, char* t ) throw(char)
 			break;
 		}
 		case 'E':
+//			string type;
+//			in >> type;
+//			in.close();
+//			*t = 'E';
+//			return new Employee( name, accountnumber, username, password);
 			break;
 		case 'M':
 			break;
@@ -330,19 +394,20 @@ int main(int argc, char* argv[])
 	string choice;
 	
 	// Output welcome message and primary menu
-	cout << "Welcome to "<<endl;
+	cout << "Welcome to OurBank"<<endl;
 	do {
 		try {
 			cout << "How might we be of service?\n"
 				<< "1) Open new account\n"
 				<< "2) Login\n"
-				<< "3) Quit" << endl;
+				<< "3) Quit\n" 
+				<< "4) Employee Login"<< endl;
 			cin >> choice;
 
 			// Check for bad input
 			if( choice.length() > 1 )
 				throw "I'm sorry. That is not an option\nPlease choose again.\n";
-			if( choice.at(0) < '1' || choice.at(0) > '3' )
+			if( choice.at(0) < '1' || choice.at(0) > '4' )
 				throw "I'm sorry. That is not an option.\nPlease choose again\n";		
 		}
 		catch(const char* s)
@@ -391,7 +456,7 @@ int main(int argc, char* argv[])
 			catch( const char* s )
 			{
 				cout << s << endl;
-				continue; // This will cause the pogram to loop again.
+				continue; // This will cause the program to loop again.
 			}
 			break; // This causes the program to move on.
 		} while( true );
@@ -453,6 +518,9 @@ int main(int argc, char* argv[])
 		// Completely exit as one has not opened anything.
 		cout << "Thank you!" << endl;
 		return 0;
+		break;
+	case '4':
+		
 		break;
 	default:
 		cerr << "Computer malfunction. Exiting!\n"<<endl;
