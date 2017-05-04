@@ -327,26 +327,30 @@ void Employee::printInfo( )
 
 void Employee::Options( )
 {
-//	string usr;
-//	cout << "Enter the username of the account you want to view" << endl;
-//	cin >> usr;
-//	try { 
-//		account = login( username, NULL, &type);
-//	}
-//	catch( char s){
-//			switch (s){
-//				case 'A':
-//				cout << "Invalid username" << endl;
-//				continue;
-//				break;
-//			default:
-//				cerr << "Something went wrong" << endl;
-//				continue;
-//				break;
-//			}
-//		}
-//		break;
-//	}
+	int choice;
+	
+	while(choice != 3){
+		cout << "What would you like to do\n"
+			<< "1) Manage Client accounts\n"
+			<< "2) View Client accounts\n"
+			<< "3) Logout"	<< endl;
+		cin >> choice;
+	
+			switch( choice )
+		{
+			case '1':
+				controlAccounts( );
+				break;
+			case '2':
+				printInfo();
+				break;
+			case '3':
+				cout << "Goodbye " << endl;
+				return;
+			default:
+				return;
+		}
+	}
 	
 }
 
@@ -354,7 +358,7 @@ void Employee::controlAccounts()
 {
 	int x;
 	string usrnm;
-	cout << "What would you like to do?\n"
+	cout << "Welcome Employee!\nWhat would you like to do?\n"
 		 << "1) Close Account\n"
 		 << "2) Exit" << endl;
 	cin >> x;
@@ -364,6 +368,7 @@ void Employee::controlAccounts()
 	
 		remove( ("accounts\\" + usrnm + ".txt").c_str());
 		
+		cout << usrnm << " file has been removed" << endl;
 		
 	} else if ( x == 2 ){
 		cout << "Exitting." << endl;
@@ -377,7 +382,7 @@ void Employee::controlAccounts()
 
 void Employee::viewStats()
 {
-	cout << "VIEW STATS" << endl;
+//	cout << "VIEW STATS" << endl;
 	return;
 }
 
@@ -442,7 +447,7 @@ void Manager::Options( )
 	
 	while (1){
 	do {
-		cout << "What do you want to do?\n"
+		cout << "Welcome Manager!\nWhat do you want to do?\n"
 			<< "1) Manage client accounts\n"
 			<< "2) View client accounts\n"
 			<< "3) Manage employees\n"
