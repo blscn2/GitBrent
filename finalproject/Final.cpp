@@ -20,6 +20,9 @@
 using namespace std;
 
 
+//Prototypes
+int getNewNumber( );
+
 //============================ Classes =======================================
 /* ABC for the different people that use this system*/
 class Person {
@@ -32,6 +35,10 @@ class Person {
 	public:
 		virtual void printInfo( void ) = 0;
 		virtual void Options( ) = 0;
+		string getName( ) { return name; }
+		string getAccountNum( ) { return to_string( accountnumber ); }
+		string getUser( ) { return username; }
+		string getPass( ) { return password; }
 		Person( );
 		Person( string , int, string, string);
 		~Person( );
@@ -66,20 +73,42 @@ class Customer: public Person {
 class Employee: public Person {
 
 	public:
-		
-		Employee( string, int, string, string);
-		
-		void printInfo(void);
-		void Options();
-		void OpenPayRoll();
-		void ControlAccounts();
-		void ViewStats();
-		
+		void printInfo( );
+		virtual void Options( );
+		void openPayRoll( );
+		void controlAccounts( );
+		void viewStats( );
+		Employee( string, int, string, string );
+};
 
-		~Employee();
+class Loan {
+	private:
+		double balance;
+		double rate;
+		Customer* client;
+	public:
+		void display( );
+		void interest( );
+		void paySome( double amount );
+		string save( );
+		Loan( string, double, double );
+		~Loan( );
+};
 
-};	
-	
+class Manager: public Employee {
+	private:
+		vector<Loan> investments;
+		vector<Employee> staff;
+	public:
+		void Options( );
+		void controlStaff( );
+		void investClient( );
+		void createPayRoll( );
+		Manager( string, int, string, string ) throw(char);
+		~Manager( );
+};
+
+
 //============================ Class functions ================================
 /*	Default constructor
 	Initializes everyting to their zero value */
@@ -271,32 +300,231 @@ void Customer::DeleteAcct(){
 }	
 
 
-
-Employee::Employee( string n, int an, string u, string p):Person(n,an,u,p){
+Employee::Employee( string n, int an, string u, string p ): Person( n, an, u, p )
+{
 
 }
 
-void Employee::printInfo(){	
+void Employee::printInfo( )
+{
+	return;
+}
+
+void Employee::Options( )
+{
+	return;
+}
+
+//========= Manager functions ================
+void Manager::Options( )
+{
+
+}
+void Manager::controlStaff( )
+{
+	string choice;
+	do {
+		cout << "What would you like to do?\n"
+			<< "a) Add a new employee\n"
+			<< "b) Remove an employee from the system\n" << endl;
+		cin >> choice;
+		try {
+			if( choice.size( ) > 1 )
+				cerr << "Only the first character is being looked at";
+			if( choice.at(0) < 'a' || choice.at(0) > 'b' )
+				throw "That is not an option\nPlease choose again";
+		}
+		catch( const char* s )
+		{
+			cout << s << endl;
+			continue;
+		}
+		break;
+	} while( true );
+
+	switch( choice.at( 0 ) )
+	{
+		case 'a': {
+			string n;
+			string u;
+			cout << "What is the name?" << endl;
+			cin >> ws;
+			getline( cin, n );
+			fstream in;
+			do {
+				in.close( );
+				cout << "\nWhat is the username?" << endl;
+				cin >> u;
+				in.open( "accounts/" + u + ".txt", fstream::in );
+				if( in.is_open( ) ) //if the username is taken, choose a different one
+					cout << "I'm sorry. That username has already been taken." << endl;
+			} while( in.is_open( ) );
+			in.close( );
+			cout << "Default password set as 12345\n"
+				<< "This can be changed on first login" << endl;
+			staff.push_back( Employee( n, getNewNumber( ), u, "12345" ) );
+			break;
+		}
+		case 'b': {
+			int i, num;
+			do {
+				
+				for( i = 0; i < staff.size( ); i++ )
+				{
+					cout << to_string(i+1)<< ") "<<staff.at( i ).getName( ) << endl;
+				}
+				cout << to_string( staff.size( ) ) << ") Return to previous screen." << endl;
+				cin >> choice;
+				try {
+					num = atoi( choice.c_str( ) );
+					if( num < 1 || num > staff.size( )+1 )
+						throw "That is not an option. Please choose again.";
+				}
+				catch( const char* s)
+				{
+					cerr << s << endl;
+					continue;
+				}
+				break;
+			} while( true );
+			break;
+			fstream out( "accounts/" + staff.at( num ).getUser( ) + ".txt", fstream::trunc | fstream::out );
+			out << staff.at( i ).getUser( ) << " NULL E" << endl;
+			out << staff.at( i ).getName( ) << endl;
+			out << staff.at( i ).getAccountNum( ) << endl;
+			out.close( );
+		}
+		default:
+			cerr << "Something went very wrong\n" << endl;
+			throw 'A';
+			break;
+	}
+	return;
+
+}
+void Manager::investClient( )
+{
+
+}
+void Manager::createPayRoll( )
+{
+
+}
+Manager::Manager( string n, int an, string u, string p ) throw(char): Employee( n, an, u, p )
+{
+	fstream in( "Employees.txt", fstream::in );
+	if( !in.is_open( ) )
+		throw 'A';
+
+	int num;
+	in >> num;
+
+	int i;
+	fstream employIn;
+	string user, pass, name;
+	char t;
+	int account;
+
+	for( i = 0; i < num; i++ )
+	{
+		in >> user;
+		employIn.open( "accounts/" + user + ".txt", fstream::in );
+		employIn >> user >> pass >> t >> ws;
+		getline( employIn, name );
+		in >> account;
+		staff.push_back( Employee( name, account, user, pass ) );
+		employIn.close( );
+	}
+	in.close( );
+
+	i = 0;
+	in.open( "loans/" + to_string(i) + ".txt", fstream::in );
+	while( in.is_open( ) )
+	{
+		double b, r;
+		string user;
+		in >> user >> b >> r;
+		investments.push_back( Loan( user, b, r ) );
+
+		in.close( );
+		i++;
+		in.open( "loans/" + to_string(i) + ".txt" , fstream::in);
+	}
+	in.close( );
+}
+Manager::~Manager( )
+{
+	fstream out( "Employees.txt", fstream::trunc | fstream::out );
+
+	out << staff.size( ) << endl;
 	
+	int i;
+	fstream employOut;
+
+	for( i = 0; i < staff.size( ); i++ )
+	{
+		out << staff.at( i ).getUser() << endl;
+		employOut.open( "accounts/" + staff.at(i).getUser() + ".txt", fstream::trunc | fstream::out );
+		employOut << staff.at( i ).getUser() << " " << staff.at( i ).getPass() << " E" << endl;
+		employOut << staff.at( i ).getName() << endl;
+		employOut << staff.at(i).getAccountNum() << endl;
+		employOut.close( );
+	}
+	out.close( );
+
+	for( i = 0; i < investments.size( ); i++ )
+	{
+		out.open( "loans/" + to_string( i ) + ".txt", fstream::trunc | fstream::out );
+		out << investments.at( i ).save() << endl;
+		out.close( );
+	}
 }
 
-void Employee::Options(){
-	
+
+//=================== Loan functions ======================
+void Loan::display( )
+{
+	client ->printInfo( );
+	cout << "currently has a loan out for\n"
+		<< balance << " at a rate of " << rate << endl << endl;
+}
+void Loan::interest( )
+{
+	balance *= ( 1 + rate );
+}
+void Loan::paySome( double amount )
+{
+	balance -= amount;
+}
+string Loan::save( )
+{
+	string one(client->getUser() +" " + to_string(balance) + " " + to_string(rate) );
+	return one;
+}
+Loan::Loan( string u, double b, double r )
+{
+	fstream in( "accounts/" + u + ".txt" );
+	if( !in.is_open( ) )
+		throw 'C';
+
+	string p, n, type;
+	double bal;
+	char t;
+	int a;
+	in >> u >> p >> t >>ws;
+	getline( in, n );
+	in >> a >> type >> b;
+
+	in.close( );
+	client = new Customer( n, a, u, p, bal,type );
+	balance = b;
+	rate = r;
 }
 
-void Employee::OpenPayRoll(){
-	
-}	
-
-void Employee::ControlAccounts(){
-	
+Loan::~Loan( )
+{
+	delete client;
 }
-
-void Employee::ViewStats(){
-
-}
-
-
 
 
 //============================ Other functions ===============================
@@ -339,13 +567,10 @@ Person* login( string user, string pass, char* t ) throw(char)
 			break;
 		}
 		case 'E':
-//			string type;
-//			in >> type;
-//			in.close();
-//			*t = 'E';
-//			return new Employee( name, accountnumber, username, password);
+			return new Employee( name, accountnumber, username, password );
 			break;
 		case 'M':
+			return new Manager( name, accountnumber, username, password );
 			break;
 	}
 	in.close( );
