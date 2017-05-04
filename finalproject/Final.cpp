@@ -221,52 +221,56 @@ void Customer::Options(){
 		}
 		catch( const char* s )
 		{
-			cout << s << endl;
-			continue;
+cout << s << endl;
+continue;
 		}
 		break;
 	} while( true );
 
 	switch( choice.at( 0 ) )
 	{
-	case '1':
-		Deposit();
-		break;
-	case '2':
-		Withdrawal();
-		break;
-	case '3':
-		int accntclose;
-		cout << "Closing your account. All balances will be withdrawn and information destroyed." << endl;
-		cout << "Are you sure you wish to delete the account?\n1) Yes\n2) No"<< endl;
-		cin >> accntclose;
-		if (accntclose == 1 ){
-		DeleteAcct();
-		} else if (accntclose == 2){
-			cout << "Account will not be closed. Returning to menu." << endl;
-		} else {
-			cout << "Invalid choice. Try again (one attempt remaining)." << endl;
-			cout << "Are you sure you wish to delete the account?\nType:\n1 for yes\n2 for no."<< endl;
-					cin >> accntclose;
-					if (accntclose == 1 ){
-						DeleteAcct();
-					} else if (accntclose == 2){
-						cout << "Account will not be closed. Returning to menu." << endl;
-						break;
-					} else {
-						cout << "Invalid choice. Account will not be deleted." << endl;
-					}
-		}
-		return;
-		break;
-	case '4':
-		cout << "Exiting options." << endl;
-		return;
-		break;
-	default:
-		throw "Something went wrong. Exiting!";
+		case '1':
+			Deposit( );
+			break;
+		case '2':
+			Withdrawal( );
+			break;
+		case '3':
+			int accntclose;
+			cout << "Closing your account. All balances will be withdrawn and information destroyed." << endl;
+			cout << "Are you sure you wish to delete the account?\n1) Yes\n2) No" << endl;
+			cin >> accntclose;
+			if( accntclose == 1 ) {
+				DeleteAcct( );
+			}
+			else if( accntclose == 2 ) {
+				cout << "Account will not be closed. Returning to menu." << endl;
+			}
+			else {
+				cout << "Invalid choice. Try again (one attempt remaining)." << endl;
+				cout << "Are you sure you wish to delete the account?\nType:\n1 for yes\n2 for no." << endl;
+				cin >> accntclose;
+				if( accntclose == 1 ) {
+					DeleteAcct( );
+				}
+				else if( accntclose == 2 ) {
+					cout << "Account will not be closed. Returning to menu." << endl;
+					break;
+				}
+				else {
+					cout << "Invalid choice. Account will not be deleted." << endl;
+				}
+			}
+			return;
+			break;
+		case '4':
+			cout << "Exiting options." << endl;
+			return;
+			break;
+		default:
+			throw "Something went wrong. Exiting!";
 	}
-	
+
 	cout << "Would you like the continue or exit\n"
 		<< "1) Continue\n"
 		<< "2) Exit\n" << endl;
@@ -274,15 +278,15 @@ void Customer::Options(){
 	}
 }
 // Delete account keeps data but removes accessiblily from customer.
-void Customer::DeleteAcct(){
-		
-		cout << "All account information will be deleted from the system and current balance paid out." << endl;
-		cout << "Will remove " << username << ".txt file" << endl;
-		
-		username = "NULL";
-		password = "NULL";
-		balance = 0;
-	
+void Customer::DeleteAcct( ) {
+
+	cout << "All account information will be deleted from the system and current balance paid out." << endl;
+	cout << "Will remove " << username << ".txt file" << endl;
+
+	username = "NULL";
+	password = "NULL";
+	balance = 0;
+
 }
 
 
@@ -302,9 +306,110 @@ void Employee::Options( )
 	return;
 }
 
+void Employee::openPayRoll( ) {
+	fstream in( "payroll.txt", fstream::in );
+	string u;
+	string schedule;
+	while( !in.eof( ) && !( username == u ) )
+	{
+		getline( in, u );
+		getline( in, schedule );
+	}
+	if( in.eof( ) )
+	{
+		cout << "You are not within this system\n" << endl;
+		return;
+	}
+	cout << "You are scheduled to work:" << endl;
+	int j;
+	for( j = 0; j < schedule.size( ); j++ )
+	{
+		switch( schedule.at( j ) - 48 )
+		{
+			case 1:
+				cout << "Monday in the ";
+				break;
+			case 2:
+				cout << "Tuesday in the ";
+				break;
+			case 3:
+				cout << "Wednesday in the ";
+				break;
+			case 4:
+				cout << "Thursday in the ";
+				break;
+			case 5:
+				cout << "Friday in the ";
+				break;
+			case 6:
+				cout << "Saturday in the ";
+				break;
+			case 7:
+				cout << "Sunday in the ";
+				break;
+		}
+		while( isspace( schedule.at( j ) ) )
+			j++;
+
+		if			( schedule.at( j ) == 'a' )
+			cout <<"morning." << endl;
+		else
+			cout <<"afternoon." << endl;
+	}
+	
+}
+
 //========= Manager functions ================
 void Manager::Options( )
 {
+	string choice;
+
+	do {
+		cout << "What do you want to do?\n"
+			<< "1) Control client accounts\n"
+			<< "2) View bank statistics\n"
+			<< "3) Manage employees\n"
+			<< "4) Manage Loans\n"
+			<< "5) Create payroll/schedule\n"
+			<< "6) Exit" << endl;
+		cin >> choice;
+		try {
+			if( choice.length( ) > 1 )
+				throw "I'm sorry. That is not an option.\nPlease choose again\n";
+			if( choice.at( 0 ) < '1' || choice.at( 0 ) > '6' )
+				throw "I'm sorry. That is not an option.\nPlease choose again\n";
+		}
+		catch( const char* s )
+		{
+			cout << s << endl;
+			continue;
+		}
+		break;
+	} while( true );
+
+	switch( choice.at( 0 ) )
+	{
+		case '1':
+			ControlAccounts( );
+			break;
+		case '2':
+			ViewStats( );
+			break;
+		case '3':
+			controlStaff( );
+			break;
+		case '4':
+			investClient( );
+			break;
+		case '5':
+			createPayRoll( );
+			break;
+		case '6':
+			cout << "Returning to main menu\n" << endl;
+			break;
+		default:
+			throw "Something went wrong. Exiting!";
+	}
 
 }
 void Manager::controlStaff( )
@@ -504,7 +609,7 @@ void Manager::createPayRoll( )
 				getline( cin, choice );
 				for( j = 0; j < choice.size( ); j++ )
 				{
-					if( choice.at( j ) < '0' || choice.at( j ) > '7' )
+					if( choice.at( j ) < '1' || choice.at( j ) > '7' )
 						throw "That is an invalid scheduling\nPlease try again\n";
 					int num = choice.at( j ) - 48;
 					while( isspace( choice.at( j ) ) )
