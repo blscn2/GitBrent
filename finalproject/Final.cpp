@@ -379,6 +379,8 @@ void Manager::controlStaff( )
 			out << staff.at( i ).getName( ) << endl;
 			out << staff.at( i ).getAccountNum( ) << endl;
 			out.close( );
+			staff.erase(staff.begin()+ (num-1) );
+			cout << "Employee removed\n" << endl;
 		}
 		default:
 			cerr << "Something went very wrong\n" << endl;
@@ -394,7 +396,59 @@ void Manager::investClient( )
 }
 void Manager::createPayRoll( )
 {
-
+	int* placed = new int[ 14 ];
+	string choice;
+	cout << "This system works by going through each employee and\n"
+		<< "placing them into the defined schedule\n"
+		<< "The number of hours determine pay\n"<< endl;
+	cout << "Enter days of the week as numbers starting with monday at 1\n"
+		<< "and place an a or p next to it to determine am or pm work\n" << endl;
+	int i;
+	int j;
+	fstream out( "payroll.txt", fstream::trunc | fstream::out );
+	for( i = 0; i < staff.size( ); i++ )
+	{
+		do {
+			try {
+				cout << "Current placings have a layout of: " << endl;
+				cout << "\tM\tT\tW\tTh\tF\tS\tS\nAM:\t";
+				for( j = 0; j < 14; j++ )
+				{
+					cout << placed[ j ] << "\t";
+					if( j == 7 )
+					{
+						cout << endl << "PM\t";
+					}
+				}
+				cout << endl;
+				cout << "Now scheduling: " << staff.at( i ).getName( ) << endl;
+				getline( cin, choice );
+				for( j = 0; j < choice.size( ); j++ )
+				{
+					if( choice.at( j ) < '0' || choice.at( j ) > '7' )
+						throw "That is an invalid scheduling\nPlease try again\n";
+					int num = choice.at( j ) - 48;
+					while( isspace( choice.at( j ) ) )
+						   j++;
+					if( choice.at( j ) != 'a' && choice.at( j ) != 'p' )
+						throw "That is an invalid scheduling\nPlease try again\n";
+					if( choice.at( j ) == 'a' )
+						placed[ num ]++;
+					else
+						placed[ num + 7 ]++;
+				}
+				out << staff.at( i ).getUser( ) << endl;
+				out << choice << endl;
+			}
+			catch( const char* s )
+			{
+				cout << s << endl;
+				continue;
+			}
+			break;
+		} while( true );
+	}
+	out.close( );
 }
 Manager::Manager( string n, int an, string u, string p ) throw(char): Employee( n, an, u, p )
 {
