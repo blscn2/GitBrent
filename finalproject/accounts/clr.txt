@@ -1,4 +1,0 @@
-clr 123 C
-Craig
-875932370
-Standard 100
