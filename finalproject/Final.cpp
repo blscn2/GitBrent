@@ -288,7 +288,6 @@ void Customer::DeleteAcct(){
 	cout << "All account information will be deleted from the system and current balance paid out." << endl;
 		
 	fstream userFile( "accounts\\" + username + ".txt", fstream::trunc | fstream::out );
-	username = "NULL";
 	password = "NULL";
 	balance = 0;
 	
@@ -529,7 +528,7 @@ void Manager::controlStaff( )
 				{
 					cout << to_string(i+1)<< ") "<<staff.at( i ).getName( ) << endl;
 				}
-				cout << to_string( staff.size( ) ) << ") Return to previous screen." << endl;
+				cout << to_string( staff.size( )+1 ) << ") Return to previous screen." << endl;
 				cin >> choice;
 				try {
 					num = atoi( choice.c_str( ) );
@@ -543,14 +542,17 @@ void Manager::controlStaff( )
 				}
 				break;
 			} while( true );
+			if( num != staff.size( ) + 1 )
+			{
+				fstream out( "accounts/" + staff.at( num - 1 ).getUser( ) + ".txt", fstream::trunc | fstream::out );
+				out << staff.at( num - 1 ).getUser( ) << " NULL E" << endl;
+				out << staff.at( num - 1 ).getName( ) << endl;
+				out << staff.at( num - 1 ).getAccountNum( ) << endl;
+				out.close( );
+				staff.erase( staff.begin( ) + ( num ) );
+				cout << "Employee removed\n" << endl;
+			}
 			break;
-			fstream out( "accounts/" + staff.at( num ).getUser( ) + ".txt", fstream::trunc | fstream::out );
-			out << staff.at( i ).getUser( ) << " NULL E" << endl;
-			out << staff.at( i ).getName( ) << endl;
-			out << staff.at( i ).getAccountNum( ) << endl;
-			out.close( );
-			staff.erase(staff.begin()+ (num-1) );
-			cout << "Employee removed\n" << endl;
 		}
 		default:
 			cerr << "Something went very wrong\n" << endl;
@@ -565,8 +567,15 @@ void Manager::investClient( )
 	string choice;
 	do {
 		try {
-			cout << "" << endl;
+			cout << "What would you like to do:\n"
+				<< "1) Issue a new loan\n"
+				<< "2) Update all loans with interest\n"
+				<< "3) Pay off a loan" << endl;
 			cin >> choice;
+			if( choice.size( ) > 1 )
+				throw "That is not an option. Please choose agian.";
+			if( choice.at( 0 ) < '1' || choice.at( 0 ) > '3' )
+				throw "That is not an option. Please choose agian.";
 		}
 		catch( const char* s )
 		{
@@ -575,7 +584,7 @@ void Manager::investClient( )
 		}
 		break;
 	} while( true );
-	
+
 	switch( choice.at( 0 ) )
 	{
 		case '1': {
@@ -640,7 +649,7 @@ void Manager::investClient( )
 		default:
 			break;
 	}
-	
+
 }
 void Manager::createPayRoll( )
 {
@@ -859,9 +868,11 @@ Person* login( string user, string pass, char* t ) throw(char)
 			break;
 		}
 		case 'E':
+			*t = 'E';
 			return new Employee( name, accountnumber, username, password );
 			break;
 		case 'M':
+			*t = 'M';
 			return new Manager( name, accountnumber, username, password );
 			break;
 	}

@@ -1,4 +1,3 @@
-sal 123 C
-Sally smith
-1433859442
-Standard 100
+NULL NULL C
+Manager Sue
+351142092
