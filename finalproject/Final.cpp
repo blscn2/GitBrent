@@ -79,7 +79,7 @@ class Employee: public Person {
 		void openPayRoll( );
 		void controlAccounts( );
 		void viewStats( );
-		Employee( string, int, string, string )throw(char);
+		Employee( string, int, string, string );
 };
 
 class Loan {
@@ -298,7 +298,7 @@ void Customer::DeleteAcct(){
 	userFile.close( );
 }	
 
-Employee::Employee( string n, int an, string u, string p )throw(char): Person( n, an, u, p )
+Employee::Employee( string n, int an, string u, string p ): Person( n, an, u, p )
 {
 	
 }
@@ -326,41 +326,62 @@ void Employee::printInfo( )
 
 void Employee::Options( )
 {
-	//Not used
+	int choice;
+	
+	while(choice != 3){
+		cout << "What would you like to do\n"
+			<< "1) Manage Client accounts\n"
+			<< "2) View Client accounts\n"
+			<< "3) Logout"	<< endl;
+		cin >> choice;
+	
+			switch( choice )
+		{
+			case '1':
+				controlAccounts( );
+				break;
+			case '2':
+				printInfo();
+				break;
+			case '3':
+				cout << "Goodbye " << endl;
+				return;
+			default:
+				return;
+		}
+	}
+	
 }
 
 void Employee::controlAccounts()
 {
 	int x;
 	string usrnm;
-	cout << "Would you like to close a client account?\n"
-		 << "1) Yes\n"
-		 << "2) No" << endl;
+	cout << "Welcome Employee!\nWhat would you like to do?\n"
+		 << "1) Close Account\n"
+		 << "2) Exit" << endl;
 	cin >> x;
 	if ( x == 1 ){
 		cout << "Enter the username of the account to be closed." << endl;
 		cin >> usrnm;
+	
+		remove( ("accounts\\" + usrnm + ".txt").c_str());
 		
-		fstream userFile( "accounts\\" + usrnm + ".txt", fstream::trunc | fstream::out );
-		username = "NULL";
-		password = "NULL";
-	
-		userFile << username << " " << password << " C" << endl;
-		userFile << name << "\n" << accountnumber << endl;
-	
-		userFile.close( );
+		cout << usrnm << " file has been removed" << endl;
 		
 	} else if ( x == 2 ){
-		cout << "No accounts will be deleted." << endl;
+		cout << "Exitting." << endl;
+		
+		return;
 	} else{
 		cout << "Invalid choice. Terminating." << endl;
 	}
-
+	return;
 }
 
 void Employee::viewStats()
 {
-	cout << "VIEW STATS" << endl;
+//	cout << "VIEW STATS" << endl;
 	return;
 }
 
@@ -425,8 +446,8 @@ void Manager::Options( )
 	
 	while (1){
 	do {
-		cout << "What do you want to do?\n"
-			<< "1) Close client accounts\n"
+		cout << "Welcome Manager!\nWhat do you want to do?\n"
+			<< "1) Manage client accounts\n"
 			<< "2) View client accounts\n"
 			<< "3) Manage employees\n"
 			<< "4) Manage Loans\n"
