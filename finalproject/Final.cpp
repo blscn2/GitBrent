@@ -89,6 +89,7 @@ public:
 	void display( );
 	void interest( );
 	void paySome( double amount );
+	bool isIssuedTo( string );
 	string save( );
 	Loan( string, double, double );
 	~Loan( );
@@ -392,7 +393,85 @@ void Manager::controlStaff( )
 }
 void Manager::investClient( )
 {
+	string choice;
+	do {
+		try {
+			cout << "" << endl;
+			cin >> choice;
+		}
+		catch( const char* s )
+		{
+			cout << s << endl;
+			continue;
+		}
+		break;
+	} while( true );
+	
+	switch( choice.at( 0 ) )
+	{
+		case '1': {
+			string u;
+			double amount, r;
+			cout << "Enter the username of the client" << endl;
+			cin >> u;
+			cout << "Enter the amount loaned" << endl;
+			cin >> amount;
+			cout << "Enter the rate at which it is loaned" << endl;
+			cin >> r;
+			investments.push_back( Loan( u, amount, r ) );
+			cout << "Loan issued\n" << endl;
+			break;
+		}
+		case '2': {
+			int i;
+			for( i = 0; i < investments.size( ); i++ )
+				investments.at( i ).interest( );
+			cout << "All investments updated\n" << endl;
+			break;
+		}
+		case '3': {
+			int amount, i;
+			string u;
+			do {
+				cout << "Enter the username of the client" << endl;
+				cin >> u;
+				while( i < investments.size( ) && !investments.at( i ).isIssuedTo( u ) )
+					i++;
+				try {
+					if( i == investments.size( ) )
+						throw "That is not a client with a loan out.";
+				}
+				catch( const char* s )
+				{
+					cout << s << endl;
+					continue;
+				}
+				break;
+			} while( true );
+			do {
+				cout << "Enter the amount being paid off\n";
+				investments.at( i ).display( );
+				cout << endl;
+				cin >> amount;
+				try {
+					if( amount <= 0 )
+						throw "Invalid amount. Please enter another";
+				}
+				catch( const char* s )
+				{
+					cout << s << endl;
+					continue;
+				}
+				break;
+			} while( true );
 
+			investments.at( i ).paySome( amount );
+			break;
+		}
+		default:
+			break;
+	}
+	
 }
 void Manager::createPayRoll( )
 {
@@ -536,6 +615,10 @@ void Loan::paySome( double amount )
 {
 	balance -= amount;
 }
+bool Loan::isIssuedTo( string u )
+{
+	return ( client->getUser( ) == u );
+}
 string Loan::save( )
 {
 	string one(client->getUser() +" " + to_string(balance) + " " + to_string(rate) );
@@ -660,7 +743,7 @@ int main(int argc, char* argv[])
 	string choice;
 	
 	// Output welcome message and primary menu
-	cout << "Welcome to "<<endl;
+	cout << "Welcome to Mizzou Bank!"<<endl;
 	do {
 		try {
 			cout << "How might we be of service?\n"
@@ -814,8 +897,10 @@ int main(int argc, char* argv[])
 		delete (Customer*) account;
 		break;
 	case 'E':
+		delete (Employee*) account;
 		break;
 	case 'M':
+		delete (Manager*) account;
 		break;
 	default:
 		delete account;
