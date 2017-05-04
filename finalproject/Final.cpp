@@ -314,14 +314,14 @@ void Employee::printInfo( )
 
 void Employee::Options( )
 {
-	//OPTIONS
+	//Not used
 }
 
 void Employee::controlAccounts()
 {
 	int x;
 	string usrnm;
-	cout << "Would you like to close an account?\n"
+	cout << "Would you like to close a client account?\n"
 		 << "1) Yes\n"
 		 << "2) No" << endl;
 	cin >> x;
