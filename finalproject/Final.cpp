@@ -337,13 +337,13 @@ void Employee::Options( )
 	
 			switch( choice )
 		{
-			case '1':
+			case 1:
 				controlAccounts( );
 				break;
-			case '2':
+			case 2:
 				printInfo();
 				break;
-			case '3':
+			case 3:
 				cout << "Goodbye " << endl;
 				return;
 			default:
