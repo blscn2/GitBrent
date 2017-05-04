@@ -82,6 +82,7 @@ class Employee: public Person {
 };
 
 class Loan {
+
 	private:
 		double balance;
 		double rate;
@@ -93,6 +94,20 @@ class Loan {
 		string save( );
 		Loan( string, double, double );
 		~Loan( );
+
+private:
+	double balance;
+	double rate;
+	Customer* client;
+public:
+	void display( );
+	void interest( );
+	void paySome( double amount );
+	bool isIssuedTo( string );
+	string save( );
+	Loan( string, double, double );
+	~Loan( );
+
 };
 
 class Manager: public Employee {
@@ -215,9 +230,8 @@ void Customer::Options(){
 
 			<< "1) Deposit\n"
 			<< "2) Withdraw\n"
-			<< "3) Close the account\n"
-			<< "4) Account Info\n"
-			<< "5) Exit" << endl;
+			<< "3) Close the account\n""
+			<< "4) Exit" << endl;
 		cin >> choice;
 		try {
 			if( choice.length( ) > 1 )
@@ -227,14 +241,15 @@ void Customer::Options(){
 		}
 		catch( const char* s )
 		{
-			cout << s << endl;
-			continue;
+cout << s << endl;
+continue;
 		}
 		break;
 	} while( true );
 
 	switch( choice.at( 0 ) )
 	{
+<<<<<<< HEAD
 	case '1':
 		Deposit();
 		break;
@@ -274,8 +289,9 @@ void Customer::Options(){
 		break;
 	default:
 		throw "Something went wrong. Exiting!";
+
 	}
-	
+
 	cout << "Would you like the continue or exit\n"
 		<< "1) Continue\n"
 		<< "2) Exit\n" << endl;
@@ -299,7 +315,6 @@ void Customer::DeleteAcct(){
 	userFile.close( );
 }	
 
-
 Employee::Employee( string n, int an, string u, string p ): Person( n, an, u, p )
 {
 
@@ -315,9 +330,110 @@ void Employee::Options( )
 	return;
 }
 
+void Employee::openPayRoll( ) {
+	fstream in( "payroll.txt", fstream::in );
+	string u;
+	string schedule;
+	while( !in.eof( ) && !( username == u ) )
+	{
+		getline( in, u );
+		getline( in, schedule );
+	}
+	if( in.eof( ) )
+	{
+		cout << "You are not within this system\n" << endl;
+		return;
+	}
+	cout << "You are scheduled to work:" << endl;
+	int j;
+	for( j = 0; j < schedule.size( ); j++ )
+	{
+		switch( schedule.at( j ) - 48 )
+		{
+			case 1:
+				cout << "Monday in the ";
+				break;
+			case 2:
+				cout << "Tuesday in the ";
+				break;
+			case 3:
+				cout << "Wednesday in the ";
+				break;
+			case 4:
+				cout << "Thursday in the ";
+				break;
+			case 5:
+				cout << "Friday in the ";
+				break;
+			case 6:
+				cout << "Saturday in the ";
+				break;
+			case 7:
+				cout << "Sunday in the ";
+				break;
+		}
+		while( isspace( schedule.at( j ) ) )
+			j++;
+
+		if			( schedule.at( j ) == 'a' )
+			cout <<"morning." << endl;
+		else
+			cout <<"afternoon." << endl;
+	}
+	
+}
+
 //========= Manager functions ================
 void Manager::Options( )
 {
+	string choice;
+
+	do {
+		cout << "What do you want to do?\n"
+			<< "1) Control client accounts\n"
+			<< "2) View bank statistics\n"
+			<< "3) Manage employees\n"
+			<< "4) Manage Loans\n"
+			<< "5) Create payroll/schedule\n"
+			<< "6) Exit" << endl;
+		cin >> choice;
+		try {
+			if( choice.length( ) > 1 )
+				throw "I'm sorry. That is not an option.\nPlease choose again\n";
+			if( choice.at( 0 ) < '1' || choice.at( 0 ) > '6' )
+				throw "I'm sorry. That is not an option.\nPlease choose again\n";
+		}
+		catch( const char* s )
+		{
+			cout << s << endl;
+			continue;
+		}
+		break;
+	} while( true );
+
+	switch( choice.at( 0 ) )
+	{
+		case '1':
+			ControlAccounts( );
+			break;
+		case '2':
+			ViewStats( );
+			break;
+		case '3':
+			controlStaff( );
+			break;
+		case '4':
+			investClient( );
+			break;
+		case '5':
+			createPayRoll( );
+			break;
+		case '6':
+			cout << "Returning to main menu\n" << endl;
+			break;
+		default:
+			throw "Something went wrong. Exiting!";
+	}
 
 }
 void Manager::controlStaff( )
@@ -393,6 +509,8 @@ void Manager::controlStaff( )
 			out << staff.at( i ).getName( ) << endl;
 			out << staff.at( i ).getAccountNum( ) << endl;
 			out.close( );
+			staff.erase(staff.begin()+ (num-1) );
+			cout << "Employee removed\n" << endl;
 		}
 		default:
 			cerr << "Something went very wrong\n" << endl;
@@ -404,11 +522,141 @@ void Manager::controlStaff( )
 }
 void Manager::investClient( )
 {
+	string choice;
+	do {
+		try {
+			cout << "" << endl;
+			cin >> choice;
+		}
+		catch( const char* s )
+		{
+			cout << s << endl;
+			continue;
+		}
+		break;
+	} while( true );
+	
+	switch( choice.at( 0 ) )
+	{
+		case '1': {
+			string u;
+			double amount, r;
+			cout << "Enter the username of the client" << endl;
+			cin >> u;
+			cout << "Enter the amount loaned" << endl;
+			cin >> amount;
+			cout << "Enter the rate at which it is loaned" << endl;
+			cin >> r;
+			investments.push_back( Loan( u, amount, r ) );
+			cout << "Loan issued\n" << endl;
+			break;
+		}
+		case '2': {
+			int i;
+			for( i = 0; i < investments.size( ); i++ )
+				investments.at( i ).interest( );
+			cout << "All investments updated\n" << endl;
+			break;
+		}
+		case '3': {
+			int amount, i;
+			string u;
+			do {
+				cout << "Enter the username of the client" << endl;
+				cin >> u;
+				while( i < investments.size( ) && !investments.at( i ).isIssuedTo( u ) )
+					i++;
+				try {
+					if( i == investments.size( ) )
+						throw "That is not a client with a loan out.";
+				}
+				catch( const char* s )
+				{
+					cout << s << endl;
+					continue;
+				}
+				break;
+			} while( true );
+			do {
+				cout << "Enter the amount being paid off\n";
+				investments.at( i ).display( );
+				cout << endl;
+				cin >> amount;
+				try {
+					if( amount <= 0 )
+						throw "Invalid amount. Please enter another";
+				}
+				catch( const char* s )
+				{
+					cout << s << endl;
+					continue;
+				}
+				break;
+			} while( true );
 
+			investments.at( i ).paySome( amount );
+			break;
+		}
+		default:
+			break;
+	}
+	
 }
 void Manager::createPayRoll( )
 {
-
+	int* placed = new int[ 14 ];
+	string choice;
+	cout << "This system works by going through each employee and\n"
+		<< "placing them into the defined schedule\n"
+		<< "The number of hours determine pay\n"<< endl;
+	cout << "Enter days of the week as numbers starting with monday at 1\n"
+		<< "and place an a or p next to it to determine am or pm work\n" << endl;
+	int i;
+	int j;
+	fstream out( "payroll.txt", fstream::trunc | fstream::out );
+	for( i = 0; i < staff.size( ); i++ )
+	{
+		do {
+			try {
+				cout << "Current placings have a layout of: " << endl;
+				cout << "\tM\tT\tW\tTh\tF\tS\tS\nAM:\t";
+				for( j = 0; j < 14; j++ )
+				{
+					cout << placed[ j ] << "\t";
+					if( j == 7 )
+					{
+						cout << endl << "PM\t";
+					}
+				}
+				cout << endl;
+				cout << "Now scheduling: " << staff.at( i ).getName( ) << endl;
+				getline( cin, choice );
+				for( j = 0; j < choice.size( ); j++ )
+				{
+					if( choice.at( j ) < '1' || choice.at( j ) > '7' )
+						throw "That is an invalid scheduling\nPlease try again\n";
+					int num = choice.at( j ) - 48;
+					while( isspace( choice.at( j ) ) )
+						   j++;
+					if( choice.at( j ) != 'a' && choice.at( j ) != 'p' )
+						throw "That is an invalid scheduling\nPlease try again\n";
+					if( choice.at( j ) == 'a' )
+						placed[ num ]++;
+					else
+						placed[ num + 7 ]++;
+				}
+				out << staff.at( i ).getUser( ) << endl;
+				out << choice << endl;
+			}
+			catch( const char* s )
+			{
+				cout << s << endl;
+				continue;
+			}
+			break;
+		} while( true );
+	}
+	out.close( );
 }
 Manager::Manager( string n, int an, string u, string p ) throw(char): Employee( n, an, u, p )
 {
@@ -495,6 +743,10 @@ void Loan::interest( )
 void Loan::paySome( double amount )
 {
 	balance -= amount;
+}
+bool Loan::isIssuedTo( string u )
+{
+	return ( client->getUser( ) == u );
 }
 string Loan::save( )
 {
@@ -619,14 +871,14 @@ int main(int argc, char* argv[])
 	string choice;
 	
 	// Output welcome message and primary menu
-	cout << "Welcome to OurBank"<<endl;
+
+	cout << "Welcome to Mizzou Bank!"<<endl;
 	do {
 		try {
 			cout << "How might we be of service?\n"
 				<< "1) Open new account\n"
 				<< "2) Login\n"
-				<< "3) Quit\n" 
-				<< "4) Employee Login"<< endl;
+				<< "3) Quit" << endl;
 			cin >> choice;
 
 			// Check for bad input
@@ -744,9 +996,6 @@ int main(int argc, char* argv[])
 		cout << "Thank you!" << endl;
 		return 0;
 		break;
-	case '4':
-		
-		break;
 	default:
 		cerr << "Computer malfunction. Exiting!\n"<<endl;
 		return 1;
@@ -777,8 +1026,10 @@ int main(int argc, char* argv[])
 		delete (Customer*) account;
 		break;
 	case 'E':
+		delete (Employee*) account;
 		break;
 	case 'M':
+		delete (Manager*) account;
 		break;
 	default:
 		delete account;
