@@ -683,6 +683,8 @@ void Manager::createPayRoll( )
 		<< "and place an a or p next to it to determine am or pm work\n" << endl;
 	int i;
 	int j;
+	for( i = 0; i < 14; i++ )
+		placed[i] = 0;
 	fstream out( "payroll.txt", fstream::trunc | fstream::out );
 	for( i = 0; i < staff.size( ); i++ )
 	{
@@ -693,7 +695,7 @@ void Manager::createPayRoll( )
 				for( j = 0; j < 14; j++ )
 				{
 					cout << placed[ j ] << "\t";
-					if( j == 7 )
+					if( j == 6 )
 					{
 						cout << endl << "PM\t";
 					}
@@ -704,16 +706,17 @@ void Manager::createPayRoll( )
 				for( j = 0; j < choice.size( ); j++ )
 				{
 					if( choice.at( j ) < '1' || choice.at( j ) > '7' )
-						throw "That is an invalid scheduling\nPlease try again\n";
+						throw "That is an invalid scheduling\n1Please try again\n";
 					int num = choice.at( j ) - 48;
+					j++;
 					while( isspace( choice.at( j ) ) )
 						   j++;
-					if( choice.at( j ) != 'a' && choice.at( j ) != 'p' )
+					if( !(choice.at( j ) == 'a' || choice.at( j ) == 'p') )
 						throw "That is an invalid scheduling\nPlease try again\n";
 					if( choice.at( j ) == 'a' )
-						placed[ num ]++;
+						placed[ num-1 ]++;
 					else
-						placed[ num + 7 ]++;
+						placed[ num + 6 ]++;
 				}
 				out << staff.at( i ).getUser( ) << endl;
 				out << choice << endl;
