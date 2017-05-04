@@ -363,54 +363,53 @@ void Employee::openPayRoll( ) {
 void Manager::Options( )
 {
 	string choice;
-
 	do {
-		cout << "What do you want to do?\n"
-			<< "1) Control client accounts\n"
-			<< "2) View bank statistics\n"
-			<< "3) Manage employees\n"
-			<< "4) Manage Loans\n"
-			<< "5) Create payroll/schedule\n"
-			<< "6) Exit" << endl;
-		cin >> choice;
-		try {
-			if( choice.length( ) > 1 )
-				throw "I'm sorry. That is not an option.\nPlease choose again\n";
-			if( choice.at( 0 ) < '1' || choice.at( 0 ) > '6' )
-				throw "I'm sorry. That is not an option.\nPlease choose again\n";
-		}
-		catch( const char* s )
+		do {
+			cout << "What do you want to do?\n"
+				<< "1) Control client accounts\n"
+				<< "2) View bank statistics\n"
+				<< "3) Manage employees\n"
+				<< "4) Manage Loans\n"
+				<< "5) Create payroll/schedule\n"
+				<< "6) Exit" << endl;
+			cin >> choice;
+			try {
+				if( choice.length( ) > 1 )
+					throw "I'm sorry. That is not an option.\nPlease choose again\n";
+				if( choice.at( 0 ) < '1' || choice.at( 0 ) > '6' )
+					throw "I'm sorry. That is not an option.\nPlease choose again\n";
+			}
+			catch( const char* s )
+			{
+				cout << s << endl;
+				continue;
+			}
+			break;
+		} while( true );
+
+		switch( choice.at( 0 ) )
 		{
-			cout << s << endl;
-			continue;
+			case '1':
+			//	ControlAccounts( );
+				break;
+			case '2':
+			//	ViewStats( );
+				break;
+			case '3':
+				controlStaff( );
+				break;
+			case '4':
+				investClient( );
+				break;
+			case '5':
+				createPayRoll( );
+				break;
+			case '6':
+				break;
+			default:
+				throw "Something went wrong. Exiting!";
 		}
-		break;
-	} while( true );
-
-	switch( choice.at( 0 ) )
-	{
-		case '1':
-			ControlAccounts( );
-			break;
-		case '2':
-			ViewStats( );
-			break;
-		case '3':
-			controlStaff( );
-			break;
-		case '4':
-			investClient( );
-			break;
-		case '5':
-			createPayRoll( );
-			break;
-		case '6':
-			cout << "Returning to main menu\n" << endl;
-			break;
-		default:
-			throw "Something went wrong. Exiting!";
-	}
-
+	} while( choice.at(0) != '6' );
 }
 void Manager::controlStaff( )
 {
@@ -465,7 +464,7 @@ void Manager::controlStaff( )
 				{
 					cout << to_string(i+1)<< ") "<<staff.at( i ).getName( ) << endl;
 				}
-				cout << to_string( staff.size( ) ) << ") Return to previous screen." << endl;
+				cout << to_string( staff.size( )+1 ) << ") Return to previous screen." << endl;
 				cin >> choice;
 				try {
 					num = atoi( choice.c_str( ) );
@@ -501,8 +500,15 @@ void Manager::investClient( )
 	string choice;
 	do {
 		try {
-			cout << "" << endl;
+			cout << "What would you like to do:\n"
+				<< "1) Issue a new loan\n"
+				<< "2) Update all loans with interest\n"
+				<< "3) Pay off a loan" << endl;
 			cin >> choice;
+			if( choice.size( ) > 1 )
+				throw "That is not an option. Please choose agian.";
+			if( choice.at( 0 ) < '1' || choice.at( 0 ) > '3' )
+				throw "That is not an option. Please choose agian.";
 		}
 		catch( const char* s )
 		{
