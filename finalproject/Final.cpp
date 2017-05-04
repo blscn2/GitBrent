@@ -78,7 +78,7 @@ class Employee: public Person {
 		void openPayRoll( );
 		void controlAccounts( );
 		void viewStats( );
-		Employee( string, int, string, string );
+		Employee( string, int, string, string )throw(char);
 };
 
 class Loan {
@@ -298,27 +298,52 @@ void Customer::DeleteAcct(){
 	userFile.close( );
 }	
 
-Employee::Employee( string n, int an, string u, string p ): Person( n, an, u, p )
+Employee::Employee( string n, int an, string u, string p )throw(char): Person( n, an, u, p )
 {
-
+	
 }
 
 void Employee::printInfo( )
 {
-	cout << "STUFF PRINT INFO" << endl;
+	string nme;
+	int x;
+	cout << "Client account usernames:" << endl;
+	
 	return;
 }
 
 void Employee::Options( )
 {
-	cout << "EMPLOYEE OPTIONS" << endl;
-	return;
+	//OPTIONS
 }
 
 void Employee::controlAccounts()
 {
-	cout << "CONTROL ACCOUNTS" << endl;
-	return;
+	int x;
+	string usrnm;
+	cout << "Would you like to close an account?\n"
+		 << "1) Yes\n"
+		 << "2) No" << endl;
+	cin >> x;
+	if ( x == 1 ){
+		cout << "Enter the username of the account to be closed." << endl;
+		cin >> usrnm;
+		
+		fstream userFile( "accounts\\" + usrnm + ".txt", fstream::trunc | fstream::out );
+		username = "NULL";
+		password = "NULL";
+	
+		userFile << username << " " << password << " C" << endl;
+		userFile << name << "\n" << accountnumber << endl;
+	
+		userFile.close( );
+		
+	} else if ( x == 2 ){
+		cout << "No accounts will be deleted." << endl;
+	} else{
+		cout << "Invalid choice. Terminating." << endl;
+	}
+
 }
 
 void Employee::viewStats()
@@ -388,8 +413,8 @@ void Manager::Options( )
 
 	do {
 		cout << "What do you want to do?\n"
-			<< "1) Control client accounts\n"
-			<< "2) View bank statistics\n"
+			<< "1) Close client accounts\n"
+			<< "2) View client accounts\n"
 			<< "3) Manage employees\n"
 			<< "4) Manage Loans\n"
 			<< "5) Create payroll/schedule\n"
@@ -415,7 +440,7 @@ void Manager::Options( )
 			controlAccounts( );
 			break;
 		case '2':
-			viewStats( );
+			printInfo();
 			break;
 		case '3':
 			controlStaff( );
@@ -442,17 +467,17 @@ void Manager::controlStaff( )
 			<< "a) Add a new employee\n"
 			<< "b) Remove an employee from the system\n" << endl;
 		cin >> choice;
-//		try {
-//			if( choice.size( ) > 1 )
-//				cerr << "Only the first character is being looked at";
-//			if( choice.at(0) < 'a' || choice.at(0) > 'b' )
-//				throw "That is not an option\nPlease choose again";
-//		}
-//		catch( const char* s )
-//		{
-//			cout << s << endl;
-//			continue;
-//		}
+		try {
+			if( choice.size( ) > 1 )
+				cerr << "Only the first character is being looked at";
+			if( choice.at(0) < 'a' || choice.at(0) > 'b' )
+				throw "That is not an option\nPlease choose again";
+		}
+		catch( const char* s )
+		{
+			cout << s << endl;
+			continue;
+		}
 		break;
 	} while( true );
 
