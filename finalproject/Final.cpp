@@ -72,6 +72,9 @@ class Customer: public Person {
 
 };
 
+//Derived from the person class an employee will have 
+//some simple options to view client accounts and 
+//view payroll
 class Employee: public Person {
 
 	public:
@@ -82,6 +85,7 @@ class Employee: public Person {
 		Employee( string, int, string, string );
 };
 
+//Accessed by the manager to create loans for clients
 class Loan {
 
 	private:
@@ -98,6 +102,9 @@ class Loan {
 		~Loan( );
 };
 
+//Derived from both the ABC Person and further from Employee
+//Manager has all the access as an employee plus can create
+//loans and payroll
 class Manager: public Employee {
 	private:
 		vector<Loan> investments;
@@ -137,6 +144,7 @@ Person::~Person( )
 
 }
 
+// Allows a person to change their password
 void Person::changePass( )
 {
 	string p, p2;
@@ -175,6 +183,7 @@ Customer::Customer( string n, int an, string u, string p, double b, string t ):P
 	balance = b;
 	accounttype = t;
 }
+
 /* Prints account information and balance */
 void Customer::printInfo(void){
 	cout << "Account holder name: " << name << endl;
@@ -196,6 +205,7 @@ Customer::~Customer(){
 	userFile.close( );
 	cout << "Account closed." << endl;
 }
+
 // Allows customer to withdraw from account
 void Customer::Withdrawal(){
 	cout << "Current account balance: $" << balance << endl << "How much would you like to withdraw?" << endl;
@@ -224,6 +234,7 @@ void Customer::Withdrawal(){
 	balance -= amount;
 	cout << "Your new balance is: $" << balance << endl;
 }
+
 // Allows customer to make a deposit
 void Customer::Deposit(){
 	cout << "Current account balance: $" << balance << endl << "How much would you like to deposit?" << endl;
@@ -235,6 +246,7 @@ void Customer::Deposit(){
 	balance += amount;
 	cout << "Your new balance is: $" << balance << endl;
 }
+
 // Option menu accessible by the customer
 void Customer::Options(){
 	string choice;
@@ -275,7 +287,7 @@ void Customer::Options(){
 		Withdrawal();
 		break;
 	case '3':
-		int accntclose;
+		int accntclose;      //Double check that the user wants to delete account
 		cout << "Closing your account. All balances will be withdrawn and information destroyed." << endl;
 		cout << "Are you sure you wish to delete the account?\n1) Yes\n2) No"<< endl;
 		cin >> accntclose;
@@ -316,6 +328,7 @@ void Customer::Options(){
 	cin >> contin;
 	}
 }
+
 // Delete account keeps data but removes accessiblily from customer.
 void Customer::DeleteAcct(){
 		
@@ -337,6 +350,7 @@ Employee::Employee( string n, int an, string u, string p ): Person( n, an, u, p 
 	
 }
 
+//Will open the accounts folder and print out all the text file names
 void Employee::printInfo( )
 {
 	string nme;
@@ -359,6 +373,8 @@ void Employee::printInfo( )
 	return;
 }
 
+//Opens when an employee logs in and allows the 
+//employee to access its functions
 void Employee::Options( )
 {
 	int choice;
@@ -397,6 +413,8 @@ void Employee::Options( )
 	
 }
 
+//Allows the employee to close client accounts by 
+//deleting thier respective text file
 void Employee::controlAccounts()
 {
 	int x;
@@ -423,6 +441,8 @@ void Employee::controlAccounts()
 	return;
 }
 	
+//Opens the employee payroll and displays their schedule
+//as it was edited by the manager	
 void Employee::openPayRoll( ) {
 	fstream in( "payroll.txt", fstream::in );
 	string u;
@@ -479,6 +499,9 @@ void Employee::openPayRoll( ) {
 }
 
 //========= Manager functions ================
+
+//Opens the manager option menu and allows them to 
+//call the manager and employee functions
 void Manager::Options( )
 {
 	string choice;
@@ -538,6 +561,9 @@ void Manager::Options( )
 	}
 
 }
+
+//Allows the manager to create new employee accounts
+//or fire(delete accounts)
 void Manager::controlStaff( )
 {
 	string choice;
@@ -625,6 +651,9 @@ void Manager::controlStaff( )
 	return;
 
 }
+
+//Opens the invest menu where the manager can issue and 
+//update loan information
 void Manager::investClient( )
 {
 	string choice;
@@ -728,6 +757,9 @@ void Manager::investClient( )
 	}
 
 }
+
+//Opens the payroll to be implemented by the manager
+//and how the employees are scheduled
 void Manager::createPayRoll( )
 {
 	int* placed = new int[ 14 ];
@@ -802,6 +834,8 @@ void Manager::createPayRoll( )
 	}
 	out.close( );
 }
+
+//Manager constructor
 Manager::Manager( string n, int an, string u, string p ) throw(char): Employee( n, an, u, p )
 {
 	fstream in( "Employees.txt", fstream::in );
@@ -844,6 +878,7 @@ Manager::Manager( string n, int an, string u, string p ) throw(char): Employee( 
 	}
 	in.close( );
 }
+
 Manager::~Manager( )
 {
 	fstream out( "Employees.txt", fstream::trunc | fstream::out );
@@ -874,29 +909,40 @@ Manager::~Manager( )
 
 
 //=================== Loan functions ======================
+//Displays loan info
 void Loan::display( )
 {
 	client ->printInfo( );
 	cout << "currently has a loan out for\n"
 		<< balance << " at a rate of " << rate << endl << endl;
 }
+
+//Calculates loan interest
 void Loan::interest( )
 {
 	balance *= ( 1 + rate );
 }
+
+//Pays off loan balance
 void Loan::paySome( double amount )
 {
 	balance -= amount;
 }
+
+//Finds the username of the client
 bool Loan::isIssuedTo( string u )
 {
 	return ( client->getUser( ) == u );
 }
+
+//Saves the loan
 string Loan::save( )
 {
 	string one(client->getUser() +" " + to_string(balance) + " " + to_string(rate) );
 	return one;
 }
+
+//Creates an account for a customer with a loan
 Loan::Loan( string u, double b, double r )
 {
 	fstream in( "accounts/" + u + ".txt" );
@@ -917,6 +963,7 @@ Loan::Loan( string u, double b, double r )
 	rate = r;
 }
 
+//Loan destructor
 Loan::~Loan( )
 {
 	delete client;
