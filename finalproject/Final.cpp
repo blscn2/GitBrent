@@ -332,7 +332,8 @@ void Employee::Options( )
 		cout << "What would you like to do\n"
 			<< "1) Manage Client accounts\n"
 			<< "2) View Client accounts\n"
-			<< "3) Logout"	<< endl;
+			<< "3) View schedule\n"
+			<< "4) Logout"	<< endl;
 		cin >> choice;
 	
 			switch( choice )
@@ -344,6 +345,9 @@ void Employee::Options( )
 				printInfo();
 				break;
 			case 3:
+				openPayRoll( );
+				break;
+			case 4:
 				cout << "Goodbye " << endl;
 				return;
 			default:
@@ -402,8 +406,9 @@ void Employee::openPayRoll( ) {
 	}
 	cout << "You are scheduled to work:" << endl;
 	int j;
-	for( j = 0; j < schedule.size( ); j++ )
-	{
+	while( schedule.size( ) > j ) {
+		while( isspace( schedule.at( j ) ) )
+			j++;
 		switch( schedule.at( j ) - 48 )
 		{
 			case 1:
@@ -428,15 +433,16 @@ void Employee::openPayRoll( ) {
 				cout << "Sunday in the ";
 				break;
 		}
+		j++;
 		while( isspace( schedule.at( j ) ) )
 			j++;
-
-		if			( schedule.at( j ) == 'a' )
-			cout <<"morning." << endl;
+		
+		if( schedule.at( j ) == 'a' )
+			cout << "morning." << endl;
 		else
-			cout <<"afternoon." << endl;
-	}
-	
+			cout << "afternoon." << endl;
+		j++;
+	}	
 }
 
 //========= Manager functions ================
@@ -611,12 +617,22 @@ void Manager::investClient( )
 		case '1': {
 			string u;
 			double amount, r;
-			cout << "Enter the username of the client" << endl;
-			cin >> u;
-			cout << "Enter the amount loaned" << endl;
-			cin >> amount;
-			cout << "Enter the rate at which it is loaned" << endl;
-			cin >> r;
+			fstream in;
+			do {
+				cout << "Enter the username of the client" << endl;
+				cin >> u;
+				in.open( "accounts/" + u + ".txt", fstream::in );
+			} while( !in.is_open() );
+			in.close( );
+			do {
+				cout << "Enter the amount loaned" << endl;
+				cin >> amount;
+			} while( amount <= 0 );
+			do {
+				cout << "Enter the rate at which it is loaned\n"
+					<< "3% is 0.03 and 10% is 0.1" << endl;
+				cin >> r;
+			} while( r < 0 || r > 0.5 );
 			investments.push_back( Loan( u, amount, r ) );
 			cout << "Loan issued\n" << endl;
 			break;
@@ -631,9 +647,13 @@ void Manager::investClient( )
 		case '3': {
 			int amount, i;
 			string u;
+			fstream in;
 			do {
-				cout << "Enter the username of the client" << endl;
-				cin >> u;
+				do {
+					cout << "Enter the username of the client" << endl;
+					cin >> u;
+					in.open( "accounts/" + u + ".txt" );
+				} while( !in.is_open( ) );
 				while( i < investments.size( ) && !investments.at( i ).isIssuedTo( u ) )
 					i++;
 				try {
@@ -680,7 +700,8 @@ void Manager::createPayRoll( )
 		<< "placing them into the defined schedule\n"
 		<< "The number of hours determine pay\n"<< endl;
 	cout << "Enter days of the week as numbers starting with monday at 1\n"
-		<< "and place an a or p next to it to determine am or pm work\n" << endl;
+		<< "and place an a or p next to it to determine am or pm work\n"
+		<< "therefore wednesday morning is entered 3a\n" << endl;
 	int i;
 	int j;
 	for( i = 0; i < 14; i++ )
@@ -702,22 +723,36 @@ void Manager::createPayRoll( )
 				}
 				cout << endl;
 				cout << "Now scheduling: " << staff.at( i ).getName( ) << endl;
+				cin >> ws;
 				getline( cin, choice );
-				for( j = 0; j < choice.size( ); j++ )
-				{
+				j = 0;
+				while( choice.size( ) > j ) {
+					while( isspace( choice.at( j ) ) )
+						j++;
 					if( choice.at( j ) < '1' || choice.at( j ) > '7' )
 						throw "That is an invalid scheduling\n1Please try again\n";
 					int num = choice.at( j ) - 48;
 					j++;
 					while( isspace( choice.at( j ) ) )
-						   j++;
-					if( !(choice.at( j ) == 'a' || choice.at( j ) == 'p') )
+						j++;
+					if( !( choice.at( j ) == 'a' || choice.at( j ) == 'p' ) )
 						throw "That is an invalid scheduling\nPlease try again\n";
+					j++;
+				}
+				while( choice.size( ) > j ) {
+					while( isspace( choice.at( j ) ) )
+						j++;
+					int num = choice.at( j ) - 48;
+					j++;
+					while( isspace( choice.at( j ) ) )
+						j++;
 					if( choice.at( j ) == 'a' )
-						placed[ num-1 ]++;
+						placed[ num - 1 ]++;
 					else
 						placed[ num + 6 ]++;
+					j++;
 				}
+
 				out << staff.at( i ).getUser( ) << endl;
 				out << choice << endl;
 			}
@@ -838,7 +873,7 @@ Loan::Loan( string u, double b, double r )
 	int a;
 	in >> u >> p >> t >>ws;
 	getline( in, n );
-	in >> a >> type >> b;
+	in >> a >> type >> bal;
 
 	in.close( );
 	client = new Customer( n, a, u, p, bal,type );
@@ -959,7 +994,7 @@ int main(int argc, char* argv[])
 			// Check for bad input
 			if( choice.length() > 1 )
 				throw "I'm sorry. That is not an option\nPlease choose again.\n";
-			if( choice.at(0) < '1' || choice.at(0) > '4' )
+			if( choice.at(0) < '1' || choice.at(0) > '3' )
 				throw "I'm sorry. That is not an option.\nPlease choose again\n";		
 		}
 		catch(const char* s)
@@ -972,7 +1007,7 @@ int main(int argc, char* argv[])
 	} while( true );
 	
 
-	Person* account;
+	Person* account = NULL;
 	char type;
 	//Branch based on menu choice.
 	switch(choice.at(0))
@@ -989,7 +1024,7 @@ int main(int argc, char* argv[])
 		fstream in;
 		do {
 			in.close( );
-			cout << "\nWhat do you want your username to be?" << endl;
+			cout << "\nWhat do you want your username to be? One group of characters only." << endl;
 			cin >> u;
 			in.open( "accounts/" + u + ".txt", fstream::in);
 			if( in.is_open( ) ) //if the username is taken, choose a different one
@@ -997,7 +1032,7 @@ int main(int argc, char* argv[])
 		} while( in.is_open( ) );
 		in.close( );
 		do {
-			cout << "\nWhat do you want your password to be?" << endl;
+			cout << "\nWhat do you want your password to be? One group of characters only." << endl;
 			cin >> p;
 			cout << "\nPlease type that again to make sure we have that right." << endl;
 			cin >> p2;
@@ -1015,7 +1050,7 @@ int main(int argc, char* argv[])
 
 		// Initalize the account.
 		cout << "\nAlright just one moment while we initialize your account" << endl;
-		account = new Customer( n, getNewNumber( ), u, p, 00.0, "Standard" );
+		account = new Customer( n, getNewNumber( ), u, p, 0.00, "Standard" );
 		type = 'C';
 		cout << "There! Your account will open just like you just logged on.\nThank you\n" << endl;
 		break;
@@ -1058,7 +1093,7 @@ int main(int argc, char* argv[])
 			}
 			break;
 		} while( attempt < 3); // If exceeded attempts exit.
-		if( attempt == 3 )
+		if( account == NULL && attempt == 3 )
 		{
 			cout << "You have exceeded maximum number of login attempts\n"
 				<< "Exiting!" << endl;
@@ -1084,7 +1119,7 @@ int main(int argc, char* argv[])
 	try {
 		account->Options( );
 	}
-	catch( const char * )
+	catch( const char * s )
 	{
 		cout << "I'm sorry something went wrong.\n"
 			<< "Your account will stay as it was when this program was openned.\n"
