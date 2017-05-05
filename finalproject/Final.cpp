@@ -36,6 +36,7 @@ class Person {
 	public:
 		virtual void printInfo( void ) = 0;
 		virtual void Options( ) = 0;
+		void changePass( );
 		string getName( ) { return name; }
 		string getAccountNum( ) { return to_string( accountnumber ); }
 		string getUser( ) { return username; }
@@ -78,7 +79,6 @@ class Employee: public Person {
 		virtual void Options( );
 		void openPayRoll( );
 		void controlAccounts( );
-		void viewStats( );
 		Employee( string, int, string, string );
 };
 
@@ -135,6 +135,36 @@ Person::Person(string n, int num, string user, string pass)
 Person::~Person( )
 {
 
+}
+
+void Person::changePass( )
+{
+	string p, p2;
+	cout << "Please enter your old password" << endl;
+	cin >> p;
+	if( p != password )
+	{
+		cout << "That is not your password" << endl;
+		return;
+	}
+
+	do {
+		cout << "\nWhat do you want your password to be? One group of characters only." << endl;
+		cin >> p;
+		cout << "\nPlease type that again to make sure we have that right." << endl;
+		cin >> p2;
+		try {
+			if( p != p2 ) // if the passwords do not match input again.
+				throw "Those do not match please try again.";
+		}
+		catch( const char* s )
+		{
+			cout << s << endl;
+			continue; // This will cause the program to loop again.
+		}
+		break; // This causes the program to move on.
+	} while( true );
+	password = p;
 }
 
 /*	Parametric constructor for all the variables of this class.
@@ -219,18 +249,19 @@ void Customer::Options(){
 			<< "1) Deposit\n"
 			<< "2) Withdraw\n"
 			<< "3) Close the account\n"
-			<< "4) Exit" << endl;
+			<< "4) Change password\n"
+			<< "5) Exit" << endl;
 		cin >> choice;
 		try {
 			if( choice.length( ) > 1 )
 				throw "I'm sorry. That is not an option.\nPlease choose again\n";
-			if( choice.at( 0 ) < '1' || choice.at( 0 ) > '4' )
+			if( choice.at( 0 ) < '1' || choice.at( 0 ) > '5' )
 				throw "I'm sorry. That is not an option.\nPlease choose again\n";
 		}
 		catch( const char* s )
 		{
-cout << s << endl;
-continue;
+			cout << s << endl;
+			continue;
 		}
 		break;
 	} while( true );
@@ -268,6 +299,9 @@ continue;
 		return;
 		break;
 	case '4':
+		changePass( );
+		break;
+	case '5':
 		cout << "Exiting options." << endl;
 		return;
 		break;
@@ -313,7 +347,8 @@ void Employee::printInfo( )
 	struct dirent *ent;
 	if(( dir = opendir("accounts\\")) != NULL){
 		while((ent = readdir (dir)) != NULL ){
-			printf("%s\n", ent->d_name);
+			if(ent->d_name[0] != '.')
+				printf("%s\n", ent->d_name);
 		}
 		closedir (dir);
 	} else{
@@ -328,12 +363,13 @@ void Employee::Options( )
 {
 	int choice;
 	
-	while(choice != 3){
+	while(choice != 4){
 		cout << "What would you like to do\n"
 			<< "1) Manage Client accounts\n"
 			<< "2) View Client accounts\n"
 			<< "3) View schedule\n"
-			<< "4) Logout"	<< endl;
+			<< "4) Change password\n"
+			<< "5) Logout"	<< endl;
 		cin >> choice;
 	
 			switch( choice )
@@ -348,9 +384,13 @@ void Employee::Options( )
 				openPayRoll( );
 				break;
 			case 4:
+				changePass( );
+				break;
+			case 5:
 				cout << "Goodbye " << endl;
 				return;
 			default:
+				cout << "That is not an option." << endl;
 				return;
 		}
 	}
@@ -382,13 +422,6 @@ void Employee::controlAccounts()
 	}
 	return;
 }
-
-void Employee::viewStats()
-{
-//	cout << "VIEW STATS" << endl;
-	return;
-}
-
 	
 void Employee::openPayRoll( ) {
 	fstream in( "payroll.txt", fstream::in );
@@ -458,12 +491,13 @@ void Manager::Options( )
 			<< "3) Manage employees\n"
 			<< "4) Manage Loans\n"
 			<< "5) Create payroll/schedule\n"
-			<< "6) Exit" << endl;
+			<< "6) Change password\n"
+			<< "7) Exit" << endl;
 		cin >> choice;
 		try {
 			if( choice.length( ) > 1 )
 				throw "I'm sorry. That is not an option.\nPlease choose again\n";
-			if( choice.at( 0 ) < '1' || choice.at( 0 ) > '6' )
+			if( choice.at( 0 ) < '1' || choice.at( 0 ) > '7' )
 				throw "I'm sorry. That is not an option.\nPlease choose again\n";
 		}
 		catch( const char* s )
@@ -493,7 +527,9 @@ void Manager::Options( )
 			createPayRoll( );
 			break;
 		case '6':
-			cout << "Returning to main menu\n" << endl;
+			changePass( );
+			break;
+		case '7':
 			return;
 			break;
 		default:
