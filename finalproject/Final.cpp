@@ -64,7 +64,6 @@ class Customer: public Person {
 		void printInfo(void);
 		void Withdrawal();
 		void Deposit();
-		void Invest();
 		void Options();
 		void DeleteAcct();
 
@@ -968,7 +967,14 @@ Person* login( string user, string pass, char* t ) throw(char)
 			break;
 		case 'M':
 			*t = 'M';
-			return new Manager( name, accountnumber, username, password );
+			try {
+				return new Manager( name, accountnumber, username, password );
+			}
+			catch( char s )
+			{
+				cout << "Sorry the system is currently down.";
+				exit( 0 );
+			}
 			break;
 	}
 	in.close( );
