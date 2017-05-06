@@ -82,6 +82,7 @@ class Employee: public Person {
 		void openPayRoll( );
 		void controlAccounts( );
 		Employee( string, int, string, string );
+		~Employee( );
 };
 
 //Accessed by the manager to create loans for clients
@@ -348,6 +349,16 @@ void Customer::DeleteAcct(){
 Employee::Employee( string n, int an, string u, string p ): Person( n, an, u, p )
 {
 	
+}
+
+Employee::~Employee( )
+{
+	fstream userFile( "accounts\\" + username + ".txt", fstream::trunc | fstream::out );
+
+	userFile << username << " " << password << " E" << endl;
+	userFile << name << "\n" << accountnumber << endl;
+
+	userFile.close( );
 }
 
 //Will open the accounts folder and print out all the text file names
