@@ -94,9 +94,10 @@ class Loan {
 	public:
 		void display( );
 		void interest( );
-		void paySome( double amount );
+		bool paySome( double amount );
 		bool isIssuedTo( string );
 		string save( );
+		Loan( );
 		Loan( string, double, double );
 		~Loan( );
 };
@@ -106,7 +107,7 @@ class Loan {
 //loans and payroll
 class Manager: public Employee {
 	private:
-		vector<Loan> investments;
+		vector<Loan*> investments;
 		vector<Employee> staff;
 	public:
 		void Options( );
@@ -202,7 +203,7 @@ Customer::~Customer(){
 	userFile << accounttype << " " << balance << endl;
 
 	userFile.close( );
-	cout << "Account closed." << endl;
+	//cout << "Account closed." << endl;
 }
 
 // Allows customer to withdraw from account
@@ -376,9 +377,9 @@ void Employee::printInfo( )
 //employee to access its functions
 void Employee::Options( )
 {
-	int choice;
+	string choice("A");
 	
-	while(choice != 4){
+	while(choice.at(0) != '5'){
 		cout << "What would you like to do\n"
 			<< "1) Manage Client accounts\n"
 			<< "2) View Client accounts\n"
@@ -387,21 +388,21 @@ void Employee::Options( )
 			<< "5) Logout"	<< endl;
 		cin >> choice;
 	
-			switch( choice )
+		switch( choice.at(0) )
 		{
-			case 1:
+			case '1':
 				controlAccounts( );
 				break;
-			case 2:
+			case '2':
 				printInfo();
 				break;
-			case 3:
+			case '3':
 				openPayRoll( );
 				break;
-			case 4:
+			case '4':
 				changePass( );
 				break;
-			case 5:
+			case '5':
 				cout << "Goodbye " << endl;
 				return;
 			default:
@@ -686,7 +687,7 @@ void Manager::investClient( )
 				cout << "Enter the username of the client" << endl;
 				cin >> u;
 				in.open( "accounts/" + u + ".txt", fstream::in );
-			} while( !in.is_open() );
+			} while( !in.is_open( ) );
 			in.close( );
 			do {
 				cout << "Enter the amount loaned" << endl;
@@ -697,19 +698,24 @@ void Manager::investClient( )
 					<< "3% is 0.03 and 10% is 0.1" << endl;
 				cin >> r;
 			} while( r < 0 || r > 0.5 );
-			investments.push_back( Loan( u, amount, r ) );
+			investments.push_back( new Loan( u, amount, r ));
 			cout << "Loan issued\n" << endl;
 			break;
 		}
 		case '2': {
 			int i;
 			for( i = 0; i < investments.size( ); i++ )
-				investments.at( i ).interest( );
+				investments.at( i )->interest( );
 			cout << "All investments updated\n" << endl;
 			break;
 		}
 		case '3': {
-			int amount, i;
+			if( investments.size( ) == 0 )
+			{
+				cout << "No loans out currently" << endl;
+				break;
+			}
+			int amount, i = 0;
 			string u;
 			fstream in;
 			do {
@@ -718,7 +724,8 @@ void Manager::investClient( )
 					cin >> u;
 					in.open( "accounts/" + u + ".txt" );
 				} while( !in.is_open( ) );
-				while( i < investments.size( ) && !investments.at( i ).isIssuedTo( u ) )
+				in.close( );
+				while( i < investments.size( ) && !investments.at( i )->isIssuedTo( u ) )
 					i++;
 				try {
 					if( i == investments.size( ) )
@@ -732,9 +739,9 @@ void Manager::investClient( )
 				break;
 			} while( true );
 			do {
+				investments.at( i )->display( );
 				cout << "Enter the amount being paid off\n";
-				investments.at( i ).display( );
-				cout << endl;
+				cin.clear( );
 				cin >> amount;
 				try {
 					if( amount <= 0 )
@@ -748,7 +755,8 @@ void Manager::investClient( )
 				break;
 			} while( true );
 
-			investments.at( i ).paySome( amount );
+			if( investments.at( i )->paySome( amount ) )
+				investments.erase( investments.begin( ) + i );
 			break;
 		}
 		default:
@@ -869,7 +877,7 @@ Manager::Manager( string n, int an, string u, string p ) throw(char): Employee( 
 		double b, r;
 		string user;
 		in >> user >> b >> r;
-		investments.push_back( Loan( user, b, r ) );
+		investments.push_back( new Loan( user, b, r ) );
 
 		in.close( );
 		i++;
@@ -898,12 +906,30 @@ Manager::~Manager( )
 	}
 	out.close( );
 
+	DIR *dir;
+	struct dirent *ent;
+	if( ( dir = opendir( "loans\\" ) ) != NULL ) {
+		while( ( ent = readdir( dir ) ) != NULL ) {
+			if( ent->d_name[ 0 ] != '.' )
+				remove( (string("loans/")+ ent->d_name).c_str() );
+		}
+		closedir( dir );
+	}
+	else {
+		perror( "Unable to open" );
+	}
+
 	for( i = 0; i < investments.size( ); i++ )
 	{
 		out.open( "loans/" + to_string( i ) + ".txt", fstream::trunc | fstream::out );
-		out << investments.at( i ).save() << endl;
+		out << investments.at( i )->save() << endl;
 		out.close( );
 	}
+
+	while( staff.size( ) > 0 )
+		staff.erase( staff.begin());
+	while( investments.size( ) > 0 )
+		investments.erase( investments.begin() );
 }
 
 
@@ -911,9 +937,8 @@ Manager::~Manager( )
 //Displays loan info
 void Loan::display( )
 {
-	client ->printInfo( );
-	cout << "currently has a loan out for\n"
-		<< balance << " at a rate of " << rate << endl << endl;
+	cout << "currently has a loan out for\n";
+	cout << balance << " at a rate of " << rate << endl;
 }
 
 //Calculates loan interest
@@ -923,14 +948,16 @@ void Loan::interest( )
 }
 
 //Pays off loan balance
-void Loan::paySome( double amount )
+bool Loan::paySome( double amount )
 {
 	balance -= amount;
+	return ( balance <= 0 );
 }
 
 //Finds the username of the client
 bool Loan::isIssuedTo( string u )
 {
+	cout << "test" << endl;
 	return ( client->getUser( ) == u );
 }
 
@@ -957,7 +984,7 @@ Loan::Loan( string u, double b, double r )
 	in >> a >> type >> bal;
 
 	in.close( );
-	client = new Customer( n, a, u, p, bal,type );
+	client = new Customer( n, a, u, p, bal, type );
 	balance = b;
 	rate = r;
 }
